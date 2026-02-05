@@ -1,8 +1,8 @@
  import { useRef } from 'react';
- import { Button } from '@/components/ui/button';
  import { Card, CardContent } from '@/components/ui/card';
  import { Progress } from '@/components/ui/progress';
- import { CheckCircle, Circle, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Check, Minus, X } from 'lucide-react';
  import { useTestState } from '@/hooks/useTestState';
  import { questions } from '@/data/questions';
  import { AnswerType } from '@/types/oca';
@@ -89,45 +89,51 @@ import HelpTipsDialog from '@/components/HelpTipsDialog';
                        </p>
  
                        {/* Кнопки ответов */}
-                       <div className="flex flex-wrap gap-2">
-                         <Button
-                           variant={answer === 'yes' ? 'default' : 'outline'}
-                           size="sm"
-                           className={cn(
-                             'flex-1 min-w-[100px]',
-                             answer === 'yes' && 'bg-success hover:bg-success/90'
-                           )}
-                           onClick={() => handleAnswer(question.id, 'yes')}
-                         >
-                           <CheckCircle className="w-4 h-4 mr-1" />
-                           Да
-                         </Button>
- 
-                         <Button
-                           variant={answer === 'maybe' ? 'default' : 'outline'}
-                           size="sm"
-                           className={cn(
-                             'flex-1 min-w-[100px]',
-                             answer === 'maybe' && 'bg-warning hover:bg-warning/90'
-                           )}
-                           onClick={() => handleAnswer(question.id, 'maybe')}
-                         >
-                           <Circle className="w-4 h-4 mr-1" />
-                           Возможно
-                         </Button>
- 
-                         <Button
-                           variant={answer === 'no' ? 'default' : 'outline'}
-                           size="sm"
-                           className={cn(
-                             'flex-1 min-w-[100px]',
-                             answer === 'no' && 'bg-destructive hover:bg-destructive/90'
-                           )}
-                           onClick={() => handleAnswer(question.id, 'no')}
-                         >
-                           <XCircle className="w-4 h-4 mr-1" />
-                           Нет
-                         </Button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleAnswer(question.id, 'yes')}
+                          className={cn(
+                            'flex-1 py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200',
+                            'flex items-center justify-center gap-1.5',
+                            'active:scale-95 touch-manipulation',
+                            answer === 'yes'
+                              ? 'bg-success text-success-foreground shadow-md'
+                              : 'bg-success/10 text-success hover:bg-success/20 border border-success/30'
+                          )}
+                        >
+                          <Check className="w-4 h-4" />
+                          <span>Да</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleAnswer(question.id, 'maybe')}
+                          className={cn(
+                            'flex-1 py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200',
+                            'flex items-center justify-center gap-1.5',
+                            'active:scale-95 touch-manipulation',
+                            answer === 'maybe'
+                              ? 'bg-warning text-warning-foreground shadow-md'
+                              : 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30'
+                          )}
+                        >
+                          <Minus className="w-4 h-4" />
+                          <span>Может</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleAnswer(question.id, 'no')}
+                          className={cn(
+                            'flex-1 py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200',
+                            'flex items-center justify-center gap-1.5',
+                            'active:scale-95 touch-manipulation',
+                            answer === 'no'
+                              ? 'bg-destructive text-destructive-foreground shadow-md'
+                              : 'bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/30'
+                          )}
+                        >
+                          <X className="w-4 h-4" />
+                          <span>Нет</span>
+                        </button>
                        </div>
                      </div>
                    </div>

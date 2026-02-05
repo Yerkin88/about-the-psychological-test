@@ -2,12 +2,13 @@
  import { Button } from '@/components/ui/button';
  import { Card, CardContent } from '@/components/ui/card';
  import { Progress } from '@/components/ui/progress';
- import { ChevronLeft, ChevronRight, CheckCircle, Circle, XCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, Minus, X } from 'lucide-react';
  import { useTestState } from '@/hooks/useTestState';
 import { useIsMobile } from '@/hooks/use-mobile';
  import { AnswerType } from '@/types/oca';
 import ThemeToggle from '@/components/ThemeToggle';
 import HelpTipsDialog from '@/components/HelpTipsDialog';
+import { cn } from '@/lib/utils';
  
  interface Props {
    onComplete: () => void;
@@ -104,44 +105,63 @@ import HelpTipsDialog from '@/components/HelpTipsDialog';
        </div>
  
        {/* Основной контент */}
-      <div className="flex-1 flex items-center justify-center p-3 md:p-4">
-        <Card className="w-full max-w-2xl shadow-lg">
-          <CardContent className="p-4 md:p-8">
-            <p className="text-lg md:text-2xl text-foreground text-center leading-relaxed mb-6 md:mb-8">
+      <div className="flex-1 flex items-center justify-center p-4 md:p-6">
+        <Card className="w-full max-w-2xl shadow-lg border-0 md:border">
+          <CardContent className="p-4 md:p-8 space-y-6 md:space-y-8">
+            {/* Текст вопроса - главный фокус */}
+            <p className="text-xl md:text-2xl text-foreground text-center leading-relaxed font-medium">
                {currentQuestion.text}
              </p>
  
              {/* Кнопки ответов */}
-            <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6 md:mb-8">
-               <Button
-                 variant={currentAnswer === 'yes' ? 'default' : 'outline'}
-                 size="lg"
-                className={`h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-base ${currentAnswer === 'yes' ? 'bg-success hover:bg-success/90' : ''}`}
-                 onClick={() => handleAnswer('yes')}
-               >
-                <CheckCircle className="w-5 h-5 md:w-6 md:h-6" />
-                 <span>ДА</span>
-               </Button>
- 
-               <Button
-                 variant={currentAnswer === 'maybe' ? 'default' : 'outline'}
-                 size="lg"
-                className={`h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-base ${currentAnswer === 'maybe' ? 'bg-warning hover:bg-warning/90' : ''}`}
-                 onClick={() => handleAnswer('maybe')}
-               >
-                <Circle className="w-5 h-5 md:w-6 md:h-6" />
-                 <span>ВОЗМОЖНО</span>
-               </Button>
- 
-               <Button
-                 variant={currentAnswer === 'no' ? 'default' : 'outline'}
-                 size="lg"
-                className={`h-16 md:h-20 flex-col gap-1 md:gap-2 text-xs md:text-base ${currentAnswer === 'no' ? 'bg-destructive hover:bg-destructive/90' : ''}`}
-                 onClick={() => handleAnswer('no')}
-               >
-                <XCircle className="w-5 h-5 md:w-6 md:h-6" />
-                 <span>НЕТ</span>
-               </Button>
+            <div className="flex gap-2 md:gap-3 justify-center">
+              {/* Да */}
+              <button
+                onClick={() => handleAnswer('yes')}
+                className={cn(
+                  'flex-1 max-w-[100px] md:max-w-[120px] py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-sm md:text-base transition-all duration-200',
+                  'flex items-center justify-center gap-1.5 md:gap-2',
+                  'active:scale-95 touch-manipulation',
+                  currentAnswer === 'yes'
+                    ? 'bg-success text-success-foreground shadow-lg ring-2 ring-success/50'
+                    : 'bg-success/10 text-success hover:bg-success/20 border border-success/30'
+                )}
+              >
+                <Check className="w-4 h-4 md:w-5 md:h-5" />
+                <span>Да</span>
+              </button>
+
+              {/* Может быть */}
+              <button
+                onClick={() => handleAnswer('maybe')}
+                className={cn(
+                  'flex-1 max-w-[100px] md:max-w-[120px] py-3 md:py-4 px-3 md:px-6 rounded-xl font-semibold text-sm md:text-base transition-all duration-200',
+                  'flex items-center justify-center gap-1.5 md:gap-2',
+                  'active:scale-95 touch-manipulation',
+                  currentAnswer === 'maybe'
+                    ? 'bg-warning text-warning-foreground shadow-lg ring-2 ring-warning/50'
+                    : 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30'
+                )}
+              >
+                <Minus className="w-4 h-4 md:w-5 md:h-5" />
+                <span>Может</span>
+              </button>
+
+              {/* Нет */}
+              <button
+                onClick={() => handleAnswer('no')}
+                className={cn(
+                  'flex-1 max-w-[100px] md:max-w-[120px] py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-sm md:text-base transition-all duration-200',
+                  'flex items-center justify-center gap-1.5 md:gap-2',
+                  'active:scale-95 touch-manipulation',
+                  currentAnswer === 'no'
+                    ? 'bg-destructive text-destructive-foreground shadow-lg ring-2 ring-destructive/50'
+                    : 'bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/30'
+                )}
+              >
+                <X className="w-4 h-4 md:w-5 md:h-5" />
+                <span>Нет</span>
+              </button>
              </div>
  
              {/* Подсказка по клавишам */}
