@@ -1,9 +1,10 @@
- import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
  import { Button } from '@/components/ui/button';
  import { Card, CardContent } from '@/components/ui/card';
  import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, ChevronRight, Check, Minus, X } from 'lucide-react';
  import { useTestState } from '@/hooks/useTestState';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { useIsMobile } from '@/hooks/use-mobile';
  import { AnswerType } from '@/types/oca';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -27,10 +28,71 @@ import { cn } from '@/lib/utils';
      prevQuestion,
    } = useTestState();
 
+  const { settings } = useAdminSettings();
   const isMobile = useIsMobile();
  
    const currentAnswer = getAnswer(currentQuestion.id);
    const progress = (answeredCount / totalQuestions) * 100;
+
+  // Стили для разных тем
+  const styleClasses = useMemo(() => {
+    switch (settings.testStyle) {
+      case 'apple':
+        return {
+          container: 'min-h-screen flex flex-col bg-gradient-to-b from-[hsl(var(--primary)/0.1)] via-background to-[hsl(var(--primary)/0.05)]',
+          header: 'backdrop-blur-md bg-background/80 border-b p-3 md:p-4',
+          card: 'w-full max-w-3xl bg-transparent border-0 shadow-none',
+          questionNumber: 'text-6xl md:text-7xl font-light text-primary/80',
+          questionText: 'text-xl md:text-2xl lg:text-3xl text-foreground text-center leading-relaxed font-normal',
+          buttonBase: 'py-4 md:py-5 px-6 md:px-10 rounded-full font-medium text-base md:text-lg transition-all duration-300 border-2',
+          buttonYes: 'border-success/50 hover:bg-success hover:text-success-foreground hover:border-success',
+          buttonYesActive: 'bg-success text-success-foreground border-success shadow-lg',
+          buttonMaybe: 'border-warning/50 hover:bg-warning hover:text-warning-foreground hover:border-warning',
+          buttonMaybeActive: 'bg-warning text-warning-foreground border-warning shadow-lg',
+          buttonNo: 'border-destructive/50 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive',
+          buttonNoActive: 'bg-destructive text-destructive-foreground border-destructive shadow-lg',
+          footer: 'backdrop-blur-md bg-background/80 border-t p-3 md:p-4',
+          progressLabel: 'text-sm uppercase tracking-wider text-muted-foreground',
+          showIcons: false,
+        };
+      case 'minimal':
+        return {
+          container: 'min-h-screen flex flex-col bg-background',
+          header: 'bg-card border-b p-3 md:p-4',
+          card: 'w-full max-w-2xl shadow-none border-0 md:border md:shadow-sm',
+          questionNumber: 'text-sm text-muted-foreground mb-2',
+          questionText: 'text-lg md:text-xl text-foreground text-center leading-relaxed font-normal',
+          buttonBase: 'py-3 md:py-4 px-6 md:px-8 rounded-lg font-medium text-sm md:text-base transition-all duration-200 border',
+          buttonYes: 'border-border hover:border-success hover:bg-success/10',
+          buttonYesActive: 'bg-success text-success-foreground border-success',
+          buttonMaybe: 'border-border hover:border-warning hover:bg-warning/10',
+          buttonMaybeActive: 'bg-warning text-warning-foreground border-warning',
+          buttonNo: 'border-border hover:border-destructive hover:bg-destructive/10',
+          buttonNoActive: 'bg-destructive text-destructive-foreground border-destructive',
+          footer: 'bg-card border-t p-3 md:p-4',
+          progressLabel: 'text-sm text-muted-foreground',
+          showIcons: false,
+        };
+      default:
+        return {
+          container: 'min-h-screen flex flex-col bg-background',
+          header: 'bg-card border-b p-3 md:p-4',
+          card: 'w-full max-w-2xl shadow-lg border-0 md:border',
+          questionNumber: 'text-lg md:text-xl text-primary font-semibold',
+          questionText: 'text-2xl md:text-3xl text-foreground text-center leading-relaxed font-semibold',
+          buttonBase: 'py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-sm md:text-base transition-all duration-200',
+          buttonYes: 'bg-success/10 text-success hover:bg-success/20 border border-success/30',
+          buttonYesActive: 'bg-success text-success-foreground shadow-lg ring-2 ring-success/50',
+          buttonMaybe: 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30',
+          buttonMaybeActive: 'bg-warning text-warning-foreground shadow-lg ring-2 ring-warning/50',
+          buttonNo: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/30',
+          buttonNoActive: 'bg-destructive text-destructive-foreground shadow-lg ring-2 ring-destructive/50',
+          footer: 'bg-card border-t p-3 md:p-4',
+          progressLabel: 'text-sm text-muted-foreground',
+          showIcons: true,
+        };
+    }
+  }, [settings.testStyle]);
  
    const handleAnswer = useCallback((answer: AnswerType) => {
      setAnswer(currentQuestion.id, answer);
@@ -82,9 +144,9 @@ import { cn } from '@/lib/utils';
   }, [handleAnswer, nextQuestion, prevQuestion, isMobile]);
  
    return (
-     <div className="min-h-screen flex flex-col">
+    <div className={styleClasses.container}>
        {/* Header с прогрессом */}
-      <div className="bg-card border-b p-3 md:p-4">
+      <div className={styleClasses.header}>
         <div className="container mx-auto max-w-2xl">
           {/* Верхняя панель с темой и помощью */}
           <div className="flex items-center justify-end gap-1 mb-3">
@@ -93,10 +155,10 @@ import { cn } from '@/lib/utils';
           </div>
 
            <div className="flex items-center justify-between mb-2">
-             <span className="text-sm text-muted-foreground">
+            <span className={styleClasses.progressLabel}>
                Вопрос {currentQuestionIndex + 1} из {totalQuestions}
              </span>
-             <span className="text-sm text-muted-foreground">
+            <span className={styleClasses.progressLabel}>
                Отвечено: {answeredCount}
              </span>
            </div>
@@ -106,28 +168,33 @@ import { cn } from '@/lib/utils';
  
        {/* Основной контент */}
       <div className="flex-1 flex items-center justify-center p-4 md:p-6">
-        <Card className="w-full max-w-2xl shadow-lg border-0 md:border">
+        <Card className={styleClasses.card}>
           <CardContent className="p-4 md:p-8 space-y-6 md:space-y-8">
-            {/* Текст вопроса - главный фокус */}
-            <p className="text-xl md:text-2xl text-foreground text-center leading-relaxed font-medium">
+            {/* Номер и текст вопроса - главный фокус */}
+            <div className="text-center space-y-3 md:space-y-4">
+              <span className={styleClasses.questionNumber}>
+                {currentQuestionIndex + 1}.
+              </span>
+              <p className={styleClasses.questionText}>
                {currentQuestion.text}
-             </p>
+              </p>
+            </div>
  
              {/* Кнопки ответов */}
-            <div className="flex gap-2 md:gap-3 justify-center">
+            <div className="flex gap-3 md:gap-4 justify-center flex-wrap">
               {/* Да */}
               <button
                 onClick={() => handleAnswer('yes')}
                 className={cn(
-                  'flex-1 max-w-[100px] md:max-w-[120px] py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-sm md:text-base transition-all duration-200',
+                  styleClasses.buttonBase,
                   'flex items-center justify-center gap-1.5 md:gap-2',
                   'active:scale-95 touch-manipulation',
                   currentAnswer === 'yes'
-                    ? 'bg-success text-success-foreground shadow-lg ring-2 ring-success/50'
-                    : 'bg-success/10 text-success hover:bg-success/20 border border-success/30'
+                    ? styleClasses.buttonYesActive
+                    : styleClasses.buttonYes
                 )}
               >
-                <Check className="w-4 h-4 md:w-5 md:h-5" />
+                {styleClasses.showIcons && <Check className="w-4 h-4 md:w-5 md:h-5" />}
                 <span>Да</span>
               </button>
 
@@ -135,47 +202,40 @@ import { cn } from '@/lib/utils';
               <button
                 onClick={() => handleAnswer('maybe')}
                 className={cn(
-                  'flex-1 max-w-[100px] md:max-w-[120px] py-3 md:py-4 px-3 md:px-6 rounded-xl font-semibold text-sm md:text-base transition-all duration-200',
+                  styleClasses.buttonBase,
                   'flex items-center justify-center gap-1.5 md:gap-2',
                   'active:scale-95 touch-manipulation',
                   currentAnswer === 'maybe'
-                    ? 'bg-warning text-warning-foreground shadow-lg ring-2 ring-warning/50'
-                    : 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30'
+                    ? styleClasses.buttonMaybeActive
+                    : styleClasses.buttonMaybe
                 )}
               >
-                <Minus className="w-4 h-4 md:w-5 md:h-5" />
-                <span>Может</span>
+                {styleClasses.showIcons && <Minus className="w-4 h-4 md:w-5 md:h-5" />}
+                <span>Может быть</span>
               </button>
 
               {/* Нет */}
               <button
                 onClick={() => handleAnswer('no')}
                 className={cn(
-                  'flex-1 max-w-[100px] md:max-w-[120px] py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-sm md:text-base transition-all duration-200',
+                  styleClasses.buttonBase,
                   'flex items-center justify-center gap-1.5 md:gap-2',
                   'active:scale-95 touch-manipulation',
                   currentAnswer === 'no'
-                    ? 'bg-destructive text-destructive-foreground shadow-lg ring-2 ring-destructive/50'
-                    : 'bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/30'
+                    ? styleClasses.buttonNoActive
+                    : styleClasses.buttonNo
                 )}
               >
-                <X className="w-4 h-4 md:w-5 md:h-5" />
+                {styleClasses.showIcons && <X className="w-4 h-4 md:w-5 md:h-5" />}
                 <span>Нет</span>
               </button>
              </div>
- 
-             {/* Подсказка по клавишам */}
-            {!isMobile && (
-              <p className="text-xs text-muted-foreground text-center">
-                Горячие клавиши: 1/Y — Да, 2/M — Возможно, 3/N — Нет, ← → — навигация
-              </p>
-            )}
            </CardContent>
          </Card>
        </div>
  
        {/* Footer с навигацией */}
-      <div className="bg-card border-t p-3 md:p-4">
+      <div className={styleClasses.footer}>
         <div className="container mx-auto max-w-2xl flex items-center justify-between">
            <Button
              variant="outline"

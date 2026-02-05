@@ -7,6 +7,8 @@
  export type ScaleKey = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J';
  
  export type DisplayMode = 'single' | 'list';
+
+export type TestStyle = 'default' | 'apple' | 'minimal';
  
  export interface ClientInfo {
    name: string;
@@ -78,6 +80,7 @@
  
  export interface AdminSettings {
    displayMode: DisplayMode;
+  testStyle: TestStyle;
    telegramBotToken: string;
    telegramChatId: string;
    redirectUrl: string;

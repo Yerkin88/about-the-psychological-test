@@ -1,7 +1,7 @@
  import { useNavigate } from 'react-router-dom';
  import { Button } from '@/components/ui/button';
  import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
- import { CheckCircle, Circle, XCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle, Circle, XCircle, ArrowRight, ArrowLeft } from 'lucide-react';
  
  export default function Instructions() {
    const navigate = useNavigate();
@@ -102,14 +102,24 @@
  
              {/* Кнопка продолжения */}
              <div className="pt-4">
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline"
+                  size="lg" 
+                  className="py-6"
+                  onClick={() => navigate('/register')}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
                <Button 
                  size="lg" 
-                 className="w-full text-lg py-6"
-                 onClick={() => navigate('/register')}
+                className="flex-1 text-lg py-6"
+                onClick={() => navigate('/test')}
                >
-                 Продолжить
+                Начать тест
                  <ArrowRight className="ml-2 w-5 h-5" />
                </Button>
+              </div>
              </div>
            </CardContent>
          </Card>

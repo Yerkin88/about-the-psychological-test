@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { AdminSettings, DisplayMode, CalibrationPoints } from '@/types/oca';
+import { AdminSettings, DisplayMode, TestStyle, CalibrationPoints } from '@/types/oca';
  
  const SETTINGS_KEY = 'oca_admin_settings';
 const CALIBRATION_KEY = 'oca_calibration';
@@ -13,6 +13,7 @@ const defaultCalibration: CalibrationPoints = {
  
  const defaultSettings: AdminSettings = {
    displayMode: 'single',
+  testStyle: 'default',
    telegramBotToken: '',
    telegramChatId: '',
    redirectUrl: '/',
@@ -32,7 +33,7 @@ const defaultCalibration: CalibrationPoints = {
     age: false,
     gender: false,
   },
-  helpTips: '## Инструкция по прохождению теста\n\n1. Отвечайте на вопросы честно, не задумываясь слишком долго\n2. Выбирайте тот вариант, который первым приходит в голову\n3. Не пропускайте вопросы — на все нужно ответить\n4. Горячие клавиши (на компьютере): 1/Y — Да, 2/M — Возможно, 3/N — Нет, ← → — навигация\n\nСреднее время прохождения: 25-40 минут',
+  helpTips: '## Инструкция по прохождению теста\n\n1. Отвечайте на вопросы честно, не задумываясь слишком долго\n2. Выбирайте тот вариант, который первым приходит в голову\n3. Не пропускайте вопросы — на все нужно ответить\n\n## Горячие клавиши (на компьютере)\n- 1/Y — Да\n- 2/M — Может быть\n- 3/N — Нет\n- ← → — навигация\n\nСреднее время прохождения: 25-40 минут',
  };
  
  export function useAdminSettings() {
@@ -76,6 +77,10 @@ const defaultCalibration: CalibrationPoints = {
      setSettings(prev => ({ ...prev, displayMode: mode }));
    }, []);
  
+  const setTestStyle = useCallback((style: TestStyle) => {
+    setSettings(prev => ({ ...prev, testStyle: style }));
+  }, []);
+
   const updateCalibration = useCallback((points: CalibrationPoints) => {
     setCalibration(points);
   }, []);
@@ -84,6 +89,7 @@ const defaultCalibration: CalibrationPoints = {
      settings,
      updateSettings,
      setDisplayMode,
+    setTestStyle,
     calibration,
     updateCalibration,
    };
