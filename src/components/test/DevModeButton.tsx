@@ -1,4 +1,4 @@
- import { useState } from 'react';
+ import { useState, useEffect, useRef } from 'react';
  import { useNavigate } from 'react-router-dom';
  import { Button } from '@/components/ui/button';
  import { Bug } from 'lucide-react';
@@ -7,8 +7,26 @@
  export default function DevModeButton() {
    const [clickCount, setClickCount] = useState(0);
    const [showButton, setShowButton] = useState(false);
+   const [isProcessing, setIsProcessing] = useState(false);
    const navigate = useNavigate();
-   const { autoFillForDev, getResult, resetTest } = useTestState();
+   const { autoFillForDev, getResult, resetTest, isComplete, clientInfo } = useTestState();
+   const shouldNavigateRef = useRef(false);
+ 
+   // Эффект для навигации после обновления состояния
+   useEffect(() => {
+     if (shouldNavigateRef.current && isComplete && clientInfo) {
+       const result = getResult();
+       if (result) {
+         const results = JSON.parse(localStorage.getItem('oca_results') || '[]');
+         results.push(result);
+         localStorage.setItem('oca_results', JSON.stringify(results));
+         resetTest();
+         shouldNavigateRef.current = false;
+         setIsProcessing(false);
+         navigate('/complete');
+       }
+     }
+   }, [isComplete, clientInfo, getResult, resetTest, navigate]);
  
    // Скрытая активация: 5 кликов по углу
    const handleHiddenClick = () => {
@@ -25,19 +43,9 @@
    };
  
    const handleAutoFill = () => {
+     setIsProcessing(true);
+     shouldNavigateRef.current = true;
      autoFillForDev();
-     
-     // Сохраняем результат и переходим на страницу завершения
-     setTimeout(() => {
-       const result = getResult();
-       if (result) {
-         const results = JSON.parse(localStorage.getItem('oca_results') || '[]');
-         results.push(result);
-         localStorage.setItem('oca_results', JSON.stringify(results));
-         resetTest();
-         navigate('/complete');
-       }
-     }, 100);
    };
  
    return (
@@ -56,9 +64,10 @@
              size="sm"
              onClick={handleAutoFill}
              className="gap-2"
+             disabled={isProcessing}
            >
              <Bug className="w-4 h-4" />
-             DEV: Автозаполнить
+             {isProcessing ? 'Обработка...' : 'DEV: Автозаполнить'}
            </Button>
          </div>
        )}
