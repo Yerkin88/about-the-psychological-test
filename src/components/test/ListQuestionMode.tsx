@@ -7,6 +7,8 @@
  import { questions } from '@/data/questions';
  import { AnswerType } from '@/types/oca';
  import { cn } from '@/lib/utils';
+import ThemeToggle from '@/components/ThemeToggle';
+import HelpTipsDialog from '@/components/HelpTipsDialog';
  
  interface Props {
    onComplete: () => void;
@@ -27,6 +29,12 @@
        {/* Sticky Header */}
        <div className="sticky top-0 z-10 bg-card border-b p-4 shadow-sm">
          <div className="container mx-auto max-w-4xl">
+          {/* Верхняя панель с темой и помощью */}
+          <div className="flex items-center justify-end gap-1 mb-3">
+            <HelpTipsDialog />
+            <ThemeToggle />
+          </div>
+
            <div className="flex items-center justify-between mb-2">
              <span className="text-sm font-medium text-foreground">
                Прогресс: {answeredCount} из {totalQuestions}

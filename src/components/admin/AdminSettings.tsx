@@ -3,6 +3,7 @@
  import { Input } from '@/components/ui/input';
  import { Switch } from '@/components/ui/switch';
  import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
  import { useAdminSettings } from '@/hooks/useAdminSettings';
  import { DisplayMode } from '@/types/oca';
  
@@ -141,6 +142,24 @@
            ))}
          </CardContent>
        </Card>
+
+      {/* Подсказки для клиента */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Подсказки для клиента</CardTitle>
+          <CardDescription>
+            Текст, который пользователь увидит нажав на кнопку (?) во время теста. Поддерживает простой Markdown.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            placeholder="## Заголовок&#10;&#10;Текст подсказки..."
+            value={settings.helpTips}
+            onChange={(e) => updateSettings({ helpTips: e.target.value })}
+            className="min-h-[200px] font-mono text-sm"
+          />
+        </CardContent>
+      </Card>
      </div>
    );
  }
