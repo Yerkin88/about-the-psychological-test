@@ -1,8 +1,6 @@
 import { useRef, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Check, Minus, X } from 'lucide-react';
 import { useTestState } from '@/hooks/useTestState';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { questions } from '@/data/questions';
@@ -10,11 +8,36 @@ import { AnswerType } from '@/types/oca';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/ThemeToggle';
 import HelpTipsDialog from '@/components/HelpTipsDialog';
- 
- interface Props {
-   onComplete: () => void;
- }
- 
+
+interface Props {
+  onComplete: () => void;
+}
+
+// Компонент радио-кнопки
+function RadioButton({ 
+  checked, 
+  onClick,
+  className 
+}: { 
+  checked: boolean; 
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
+        "hover:border-primary",
+        checked ? "border-primary bg-primary" : "border-muted-foreground/50",
+        className
+      )}
+    >
+      {checked && <div className="w-2 h-2 rounded-full bg-white" />}
+    </button>
+  );
+}
+
 export default function ListQuestionMode({ onComplete }: Props) {
   const { answeredCount, totalQuestions, isComplete, setAnswer, getAnswer } = useTestState();
   const { settings } = useAdminSettings();
@@ -27,54 +50,42 @@ export default function ListQuestionMode({ onComplete }: Props) {
     switch (settings.testStyle) {
       case 'apple':
         return {
-          container: 'min-h-screen flex flex-col bg-gradient-to-b from-[hsl(var(--primary)/0.1)] via-background to-[hsl(var(--primary)/0.05)]',
-          header: 'backdrop-blur-md bg-background/80 border-b p-4 shadow-sm',
-          card: 'bg-card/50 backdrop-blur-sm border-0 shadow-lg rounded-2xl',
-          cardAnswered: 'border-success/30 bg-success/5',
-          questionNumber: 'text-primary/80 font-light',
-          questionText: 'text-lg text-foreground leading-relaxed font-normal',
-          buttonBase: 'flex-1 min-w-0 py-2 px-1.5 sm:px-3 rounded-full font-medium text-xs sm:text-sm transition-all duration-300 border-2',
-          buttonYes: 'border-success/50 text-success hover:bg-success hover:text-white hover:border-success dark:text-success dark:hover:text-white',
-          buttonYesActive: 'bg-success text-white border-success shadow-lg',
-          buttonMaybe: 'border-warning/50 text-warning hover:bg-warning hover:text-white hover:border-warning dark:text-warning dark:hover:text-white',
-          buttonMaybeActive: 'bg-warning text-white border-warning shadow-lg',
-          buttonNo: 'border-destructive/50 text-destructive hover:bg-destructive hover:text-white hover:border-destructive dark:text-destructive dark:hover:text-white',
-          buttonNoActive: 'bg-destructive text-white border-destructive shadow-lg',
-          showIcons: false,
+          container: 'min-h-screen flex flex-col bg-gradient-to-b from-[#1a365d] via-[#234e7a] to-[#1a365d]',
+          header: 'backdrop-blur-md bg-white/10 border-b border-white/20 p-4',
+          headerText: 'text-white',
+          progressLabel: 'text-white/80',
+          questionRow: 'border-b border-white/10 py-3',
+          questionNumber: 'text-white/60 font-normal',
+          questionText: 'text-white leading-relaxed',
+          radioColor: 'border-white/50 hover:border-white',
+          radioChecked: 'border-white bg-white',
+          radioInner: 'bg-[#1a365d]',
         };
       case 'minimal':
         return {
           container: 'min-h-screen flex flex-col bg-background',
           header: 'bg-card border-b p-4',
-          card: 'shadow-none border rounded-lg',
-          cardAnswered: 'border-success/50 bg-success/5',
-          questionNumber: 'text-muted-foreground',
-          questionText: 'text-base text-foreground leading-relaxed font-normal',
-          buttonBase: 'flex-1 min-w-0 py-2 px-1.5 sm:px-3 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200 border',
-          buttonYes: 'border-border text-foreground hover:border-success hover:bg-success/10',
-          buttonYesActive: 'bg-success text-white border-success',
-          buttonMaybe: 'border-border text-foreground hover:border-warning hover:bg-warning/10',
-          buttonMaybeActive: 'bg-warning text-white border-warning',
-          buttonNo: 'border-border text-foreground hover:border-destructive hover:bg-destructive/10',
-          buttonNoActive: 'bg-destructive text-white border-destructive',
-          showIcons: false,
+          headerText: 'text-foreground',
+          progressLabel: 'text-muted-foreground',
+          questionRow: 'border-b border-border py-3',
+          questionNumber: 'text-muted-foreground font-normal',
+          questionText: 'text-foreground leading-relaxed',
+          radioColor: 'border-muted-foreground/50 hover:border-primary',
+          radioChecked: 'border-primary bg-primary',
+          radioInner: 'bg-white',
         };
       default:
         return {
           container: 'min-h-screen flex flex-col bg-background',
           header: 'bg-card border-b p-4 shadow-sm',
-          card: 'shadow-sm border rounded-xl',
-          cardAnswered: 'border-success/50 bg-success/5',
-          questionNumber: 'text-primary font-semibold',
-          questionText: 'text-base text-foreground leading-relaxed font-medium',
-          buttonBase: 'flex-1 min-w-0 py-1.5 px-1 sm:px-2 rounded-lg font-medium text-xs transition-all duration-200',
-          buttonYes: 'bg-success/10 text-success hover:bg-success/20 border border-success/30 dark:text-success',
-          buttonYesActive: 'bg-success text-white shadow-md',
-          buttonMaybe: 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30 dark:text-warning',
-          buttonMaybeActive: 'bg-warning text-white shadow-md',
-          buttonNo: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/30 dark:text-destructive',
-          buttonNoActive: 'bg-destructive text-white shadow-md',
-          showIcons: true,
+          headerText: 'text-foreground',
+          progressLabel: 'text-muted-foreground',
+          questionRow: 'border-b border-border py-3',
+          questionNumber: 'text-primary font-medium',
+          questionText: 'text-foreground leading-relaxed',
+          radioColor: 'border-muted-foreground/50 hover:border-primary',
+          radioChecked: 'border-primary bg-primary',
+          radioInner: 'bg-white',
         };
     }
   }, [settings.testStyle]);
@@ -82,7 +93,9 @@ export default function ListQuestionMode({ onComplete }: Props) {
   const handleAnswer = (questionId: number, answer: AnswerType) => {
     setAnswer(questionId, answer);
   };
- 
+
+  const isApple = settings.testStyle === 'apple';
+
   return (
     <div className={styleClasses.container}>
       {/* Sticky Header */}
@@ -90,24 +103,30 @@ export default function ListQuestionMode({ onComplete }: Props) {
         <div className="container mx-auto max-w-4xl">
           {/* Верхняя панель с темой и помощью */}
           <div className="flex items-center justify-end gap-1 mb-3">
-            <HelpTipsDialog />
-            <ThemeToggle />
+            <HelpTipsDialog className={isApple ? 'text-white/70 hover:text-white' : ''} />
+            <ThemeToggle className={isApple ? 'text-white/70 hover:text-white' : ''} />
           </div>
 
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground">
+            <span className={cn("text-sm font-medium", styleClasses.headerText)}>
               Прогресс: {answeredCount} из {totalQuestions}
             </span>
-            <span className="text-sm text-muted-foreground">
+            <span className={cn("text-sm", styleClasses.progressLabel)}>
               {Math.round(progress)}%
             </span>
           </div>
-          <Progress value={progress} className="h-3" />
+          <Progress 
+            value={progress} 
+            className={cn("h-2", isApple && "bg-white/20")} 
+          />
           
           {isComplete && (
             <Button 
               onClick={onComplete} 
-              className="w-full mt-4 bg-success hover:bg-success/90"
+              className={cn(
+                "w-full mt-4",
+                isApple ? "bg-white text-[#1a365d] hover:bg-white/90" : "bg-success hover:bg-success/90"
+              )}
               size="lg"
             >
               Завершить тест
@@ -116,98 +135,198 @@ export default function ListQuestionMode({ onComplete }: Props) {
         </div>
       </div>
 
+      {/* Legend */}
+      <div className={cn("border-b py-3 px-4", isApple ? "border-white/10 bg-white/5" : "border-border bg-muted/30")}>
+        <div className="container mx-auto max-w-4xl">
+          <table className="w-full text-sm">
+            <tbody>
+              <tr className={styleClasses.questionRow}>
+                <td className="w-12 text-center">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 mx-auto",
+                    isApple ? "border-white bg-white" : "border-primary bg-primary"
+                  )}>
+                    <div className={cn("w-full h-full rounded-full flex items-center justify-center")}>
+                      <div className={cn("w-1.5 h-1.5 rounded-full", isApple ? "bg-[#1a365d]" : "bg-white")} />
+                    </div>
+                  </div>
+                </td>
+                <td className="w-12 text-center">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 mx-auto",
+                    isApple ? "border-white/50" : "border-muted-foreground/50"
+                  )} />
+                </td>
+                <td className="w-12 text-center">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 mx-auto",
+                    isApple ? "border-white/50" : "border-muted-foreground/50"
+                  )} />
+                </td>
+                <td className={cn("pl-4", styleClasses.questionText)}>
+                  означает <strong>да</strong> или <span className={isApple ? "text-white/80" : "text-muted-foreground"}>скорее всего да</span>
+                </td>
+              </tr>
+              <tr className={styleClasses.questionRow}>
+                <td className="w-12 text-center">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 mx-auto",
+                    isApple ? "border-white/50" : "border-muted-foreground/50"
+                  )} />
+                </td>
+                <td className="w-12 text-center">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 mx-auto",
+                    isApple ? "border-white bg-white" : "border-primary bg-primary"
+                  )}>
+                    <div className={cn("w-full h-full rounded-full flex items-center justify-center")}>
+                      <div className={cn("w-1.5 h-1.5 rounded-full", isApple ? "bg-[#1a365d]" : "bg-white")} />
+                    </div>
+                  </div>
+                </td>
+                <td className="w-12 text-center">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 mx-auto",
+                    isApple ? "border-white/50" : "border-muted-foreground/50"
+                  )} />
+                </td>
+                <td className={cn("pl-4", styleClasses.questionText)}>
+                  означает <strong>может быть</strong> или <span className={isApple ? "text-white/80" : "text-muted-foreground"}>неуверен</span>
+                </td>
+              </tr>
+              <tr className={cn(styleClasses.questionRow, "border-b-0")}>
+                <td className="w-12 text-center">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 mx-auto",
+                    isApple ? "border-white/50" : "border-muted-foreground/50"
+                  )} />
+                </td>
+                <td className="w-12 text-center">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 mx-auto",
+                    isApple ? "border-white/50" : "border-muted-foreground/50"
+                  )} />
+                </td>
+                <td className="w-12 text-center">
+                  <div className={cn(
+                    "w-4 h-4 rounded-full border-2 mx-auto",
+                    isApple ? "border-white bg-white" : "border-primary bg-primary"
+                  )}>
+                    <div className={cn("w-full h-full rounded-full flex items-center justify-center")}>
+                      <div className={cn("w-1.5 h-1.5 rounded-full", isApple ? "bg-[#1a365d]" : "bg-white")} />
+                    </div>
+                  </div>
+                </td>
+                <td className={cn("pl-4", styleClasses.questionText)}>
+                  означает <strong>нет</strong> или <span className={isApple ? "text-white/80" : "text-muted-foreground"}>скорее всего нет</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Section Title */}
+      <div className={cn("py-3 px-4", isApple ? "bg-white/5" : "bg-muted/20")}>
+        <div className="container mx-auto max-w-4xl">
+          <h2 className={cn("text-lg font-semibold", isApple ? "text-orange-400" : "text-primary")}>
+            Начало теста
+          </h2>
+        </div>
+      </div>
+
       {/* Questions List */}
       <div ref={containerRef} className="flex-1 overflow-y-auto">
-        <div className="container mx-auto max-w-4xl py-4 px-4 space-y-3">
-          {questions.map((question, index) => {
-            const answer = getAnswer(question.id);
-            const isAnswered = answer !== undefined;
+        <div className="container mx-auto max-w-4xl px-4">
+          <table className="w-full">
+            <tbody>
+              {questions.map((question, index) => {
+                const answer = getAnswer(question.id);
 
-            return (
-              <Card 
-                key={question.id}
-                className={cn(
-                  'transition-all',
-                  styleClasses.card,
-                  isAnswered && styleClasses.cardAnswered
-                )}
-              >
-                <CardContent className="p-3 sm:p-4">
-                  <div className="space-y-2.5">
-                    {/* Текст вопроса */}
-                    <p className={styleClasses.questionText}>
-                      <span className={styleClasses.questionNumber}>{index + 1}. </span>{question.text}
-                    </p>
-
-                    {/* Кнопки ответов */}
-                    <div className="flex gap-1.5 sm:gap-2">
+                return (
+                  <tr 
+                    key={question.id}
+                    className={cn(styleClasses.questionRow, "hover:bg-white/5")}
+                  >
+                    <td className={cn("w-8 text-right pr-2 align-top pt-1", styleClasses.questionNumber)}>
+                      {index + 1}
+                    </td>
+                    <td className="w-10 text-center align-top pt-1">
                       <button
                         onClick={() => handleAnswer(question.id, 'yes')}
                         className={cn(
-                          styleClasses.buttonBase,
-                          'flex items-center justify-center gap-1',
-                          'active:scale-95 touch-manipulation',
-                          answer === 'yes'
-                            ? styleClasses.buttonYesActive
-                            : styleClasses.buttonYes
+                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors mx-auto",
+                          answer === 'yes' 
+                            ? styleClasses.radioChecked
+                            : styleClasses.radioColor
                         )}
                       >
-                        {styleClasses.showIcons && <Check className="w-3.5 h-3.5 flex-shrink-0" />}
-                        <span className="truncate">Да</span>
+                        {answer === 'yes' && (
+                          <div className={cn("w-2 h-2 rounded-full", styleClasses.radioInner)} />
+                        )}
                       </button>
-
+                    </td>
+                    <td className="w-10 text-center align-top pt-1">
                       <button
                         onClick={() => handleAnswer(question.id, 'maybe')}
                         className={cn(
-                          styleClasses.buttonBase,
-                          'flex items-center justify-center gap-1',
-                          'active:scale-95 touch-manipulation',
-                          answer === 'maybe'
-                            ? styleClasses.buttonMaybeActive
-                            : styleClasses.buttonMaybe
+                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors mx-auto",
+                          answer === 'maybe' 
+                            ? styleClasses.radioChecked
+                            : styleClasses.radioColor
                         )}
                       >
-                        {styleClasses.showIcons && <Minus className="w-3.5 h-3.5 flex-shrink-0" />}
-                        <span className="truncate">Может быть</span>
+                        {answer === 'maybe' && (
+                          <div className={cn("w-2 h-2 rounded-full", styleClasses.radioInner)} />
+                        )}
                       </button>
-
+                    </td>
+                    <td className="w-10 text-center align-top pt-1">
                       <button
                         onClick={() => handleAnswer(question.id, 'no')}
                         className={cn(
-                          styleClasses.buttonBase,
-                          'flex items-center justify-center gap-1',
-                          'active:scale-95 touch-manipulation',
-                          answer === 'no'
-                            ? styleClasses.buttonNoActive
-                            : styleClasses.buttonNo
+                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors mx-auto",
+                          answer === 'no' 
+                            ? styleClasses.radioChecked
+                            : styleClasses.radioColor
                         )}
                       >
-                        {styleClasses.showIcons && <X className="w-3.5 h-3.5 flex-shrink-0" />}
-                        <span className="truncate">Нет</span>
+                        {answer === 'no' && (
+                          <div className={cn("w-2 h-2 rounded-full", styleClasses.radioInner)} />
+                        )}
                       </button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                    </td>
+                    <td className={cn("pl-3 align-top", styleClasses.questionText)}>
+                      {question.text}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
- 
-       {/* Bottom Complete Button (Fixed) */}
-       {isComplete && (
-         <div className="sticky bottom-0 bg-card border-t p-4">
-           <div className="container mx-auto max-w-4xl">
-             <Button 
-               onClick={onComplete} 
-               className="w-full bg-success hover:bg-success/90"
-               size="lg"
-             >
-               Завершить тест
-             </Button>
-           </div>
-         </div>
-       )}
-     </div>
-   );
- }
+
+      {/* Bottom Complete Button (Fixed) */}
+      {isComplete && (
+        <div className={cn(
+          "sticky bottom-0 border-t p-4",
+          isApple ? "bg-[#1a365d]/90 backdrop-blur-md border-white/20" : "bg-card border-border"
+        )}>
+          <div className="container mx-auto max-w-4xl">
+            <Button 
+              onClick={onComplete} 
+              className={cn(
+                "w-full",
+                isApple ? "bg-white text-[#1a365d] hover:bg-white/90" : "bg-success hover:bg-success/90"
+              )}
+              size="lg"
+            >
+              Завершить тест
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

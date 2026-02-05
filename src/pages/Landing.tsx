@@ -44,7 +44,7 @@
            <Button 
              size="lg" 
              className="text-lg px-8 py-6"
-             onClick={() => navigate('/instructions')}
+              onClick={() => navigate('/register')}
            >
              Пройти тест
            </Button>
@@ -123,7 +123,7 @@
              size="lg" 
              variant="secondary"
              className="text-lg px-8 py-6"
-             onClick={() => navigate('/instructions')}
+             onClick={() => navigate('/register')}
            >
              Начать тест
            </Button>
