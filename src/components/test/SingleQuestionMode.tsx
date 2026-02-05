@@ -191,9 +191,9 @@ import { cn } from '@/lib/utils';
         )}
 
         <Card className={styleClasses.card}>
-          <CardContent className="p-4 md:p-8 space-y-6 md:space-y-8">
+          <CardContent className="p-4 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[320px]">
             {/* Номер и текст вопроса */}
-            <div className="text-center">
+            <div className="text-center flex-1 flex items-center justify-center">
               <p className={styleClasses.questionText}>
                 <span className={styleClasses.questionNumber}>{currentQuestionIndex + 1}. </span>
                 {currentQuestion.text}
@@ -202,7 +202,7 @@ import { cn } from '@/lib/utils';
  
              {/* Кнопки ответов */}
             <div className={cn(
-              "flex justify-center",
+              "flex justify-center mt-6 md:mt-8",
               settings.testStyle === 'apple' ? "gap-3 md:gap-4" : "gap-2 md:gap-3 w-full"
             )}>
               {/* Да */}
