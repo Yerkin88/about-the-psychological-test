@@ -42,7 +42,7 @@ import { cn } from '@/lib/utils';
           container: 'min-h-screen flex flex-col bg-gradient-to-b from-[#1a365d] via-[#234e7a] to-[#1a365d]',
           header: 'bg-transparent border-b border-white/10 p-3 md:p-4',
           card: 'w-full max-w-3xl bg-transparent border-0 shadow-none',
-          questionNumber: 'text-white text-4xl md:text-6xl font-light block mb-4',
+          questionNumber: 'text-white/70 font-light',
           questionText: 'text-lg md:text-xl lg:text-2xl text-white text-center leading-relaxed font-normal',
           buttonBase: 'min-w-[100px] md:min-w-[140px] py-2.5 md:py-3 px-4 md:px-8 rounded-full font-medium text-sm md:text-base transition-all duration-300 border-2 uppercase tracking-wide',
           buttonYes: 'border-white/60 text-white bg-white/10 hover:bg-white/20 hover:border-white',
@@ -191,19 +191,10 @@ import { cn } from '@/lib/utils';
           <CardContent className="p-4 md:p-8 space-y-6 md:space-y-8">
             {/* Номер и текст вопроса */}
             <div className="text-center">
-              {settings.testStyle === 'apple' ? (
-                <>
-                  <span className={styleClasses.questionNumber}>{currentQuestionIndex + 1}.</span>
-                  <p className={styleClasses.questionText}>
-                    {currentQuestion.text}
-                  </p>
-                </>
-              ) : (
-                <p className={styleClasses.questionText}>
-                  <span className={styleClasses.questionNumber}>{currentQuestionIndex + 1}. </span>
-                  {currentQuestion.text}
-                </p>
-              )}
+              <p className={styleClasses.questionText}>
+                <span className={styleClasses.questionNumber}>{currentQuestionIndex + 1}. </span>
+                {currentQuestion.text}
+              </p>
             </div>
  
              {/* Кнопки ответов */}
