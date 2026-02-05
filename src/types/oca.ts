@@ -89,6 +89,7 @@
      age: boolean;
      gender: boolean;
    };
+  helpTips: string; // Подсказки для клиента (редактируемые в админке)
  }
  
  export interface NormTable {
