@@ -1,7 +1,15 @@
- import { useState, useCallback, useEffect } from 'react';
- import { AdminSettings, DisplayMode } from '@/types/oca';
+import { useState, useCallback, useEffect } from 'react';
+import { AdminSettings, DisplayMode, CalibrationPoints } from '@/types/oca';
  
  const SETTINGS_KEY = 'oca_admin_settings';
+const CALIBRATION_KEY = 'oca_calibration';
+
+const defaultCalibration: CalibrationPoints = {
+  top: 127,
+  bottom: 596,
+  left: 116,
+  right: 1040,
+};
  
  const defaultSettings: AdminSettings = {
    displayMode: 'single',
@@ -40,10 +48,26 @@
      return defaultSettings;
    });
  
+  const [calibration, setCalibration] = useState<CalibrationPoints>(() => {
+    const saved = localStorage.getItem(CALIBRATION_KEY);
+    if (saved) {
+      try {
+        return { ...defaultCalibration, ...JSON.parse(saved) };
+      } catch {
+        return defaultCalibration;
+      }
+    }
+    return defaultCalibration;
+  });
+
    useEffect(() => {
      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
    }, [settings]);
  
+  useEffect(() => {
+    localStorage.setItem(CALIBRATION_KEY, JSON.stringify(calibration));
+  }, [calibration]);
+
    const updateSettings = useCallback((updates: Partial<AdminSettings>) => {
      setSettings(prev => ({ ...prev, ...updates }));
    }, []);
@@ -52,9 +76,17 @@
      setSettings(prev => ({ ...prev, displayMode: mode }));
    }, []);
  
+  const updateCalibration = useCallback((points: CalibrationPoints) => {
+    setCalibration(points);
+  }, []);
+
    return {
      settings,
      updateSettings,
      setDisplayMode,
+    calibration,
+    updateCalibration,
    };
  }
+
+export { defaultCalibration };

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Percentiles, ScaleKey, AnswerType } from '@/types/oca';
+import { Percentiles, ScaleKey, AnswerType, CalibrationPoints } from '@/types/oca';
 import ocaTemplate from '@/assets/oca-template.jpg';
  
  interface Props {
@@ -9,20 +9,20 @@ import ocaTemplate from '@/assets/oca-template.jpg';
    testDate: string;
    q22Answer: AnswerType;
    q197Answer: AnswerType;
+  calibration?: CalibrationPoints;
  }
  
-// Координаты откалиброваны под изображение трафарета (1156x842) - Мой_ОСА_тест-2.jpg
-const TEMPLATE = {
+// Дефолтные координаты под изображение трафарета (1156x842)
+const DEFAULT_CALIBRATION: CalibrationPoints = {
+  top: 127,
+  bottom: 596,
+  left: 116,
+  right: 1040,
+};
+
+const TEMPLATE_SIZE = {
   width: 1156,
   height: 842,
-  // Область графика (шкала -100..+100)
-  graph: {
-    left: 116,    // X левой оси (шкала A)
-    right: 1040,  // X правой оси (шкала J)
-    top: 127,     // Y = +100 (верхняя линия сетки)
-    bottom: 596,  // Y = -100 (нижняя линия сетки)
-  },
-  // Позиции для текста клиента (из эталонного изображения)
   header: {
     titleY: 40,      // "Результаты теста OCA"
     infoY: 75,       // Имя | Возраст | Дата
@@ -40,30 +40,31 @@ const TEMPLATE = {
    testDate,
    q22Answer,
    q197Answer,
+  calibration = DEFAULT_CALIBRATION,
  }: Props) {
    const scales: ScaleKey[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
-  const { width, height, graph, header, footer } = TEMPLATE;
-  const graphWidth = graph.right - graph.left;
-  const graphHeight = graph.bottom - graph.top;
+  const { width, height, header, footer } = TEMPLATE_SIZE;
+  const graphWidth = calibration.right - calibration.left;
+  const graphHeight = calibration.bottom - calibration.top;
   const xStep = graphWidth / (scales.length - 1);
 
   // Преобразование значения -100..+100 в Y-координату
   const yScale = (value: number) => {
     const normalized = (100 - value) / 200; // 0 = +100, 1 = -100
-    return graph.top + normalized * graphHeight;
+    return calibration.top + normalized * graphHeight;
   };
  
    // Точки графика
    const points = useMemo(() => {
      return scales.map((scale, i) => ({
-      x: graph.left + i * xStep,
+      x: calibration.left + i * xStep,
        y: yScale(percentiles[scale]),
        value: percentiles[scale],
        scale,
      }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [percentiles]);
+  }, [percentiles, calibration]);
  
    // Путь линии
    const linePath = points.map((p, i) => 
@@ -101,7 +102,7 @@ const TEMPLATE = {
           fontWeight={700}
           fill="#000"
         >
-          Результаты теста OCA
+          Результаты теста
         </text>
 
         {/* Информация о клиенте — упорядоченно в одну линию */}

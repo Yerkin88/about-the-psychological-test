@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
  import { Label } from '@/components/ui/label';
@@ -5,11 +6,15 @@ import { Badge } from '@/components/ui/badge';
  import { Switch } from '@/components/ui/switch';
  import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Crosshair } from 'lucide-react';
  import { useAdminSettings } from '@/hooks/useAdminSettings';
  import { DisplayMode } from '@/types/oca';
+import GraphCalibration from './GraphCalibration';
  
  export default function AdminSettings() {
-   const { settings, updateSettings, setDisplayMode } = useAdminSettings();
+  const { settings, updateSettings, setDisplayMode, calibration, updateCalibration } = useAdminSettings();
+  const [showCalibration, setShowCalibration] = useState(false);
  
    return (
      <div className="space-y-6">
@@ -173,6 +178,47 @@ import { Textarea } from '@/components/ui/textarea';
            ))}
          </CardContent>
        </Card>
+
+      {/* Калибровка графика */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Калибровка графика</CardTitle>
+          <CardDescription>
+            Настройте точное позиционирование графика на трафарете OCA
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="p-3 bg-secondary/50 rounded-lg text-center">
+              <p className="text-muted-foreground">+100 (Y)</p>
+              <p className="font-mono font-bold">{calibration.top}</p>
+            </div>
+            <div className="p-3 bg-secondary/50 rounded-lg text-center">
+              <p className="text-muted-foreground">-100 (Y)</p>
+              <p className="font-mono font-bold">{calibration.bottom}</p>
+            </div>
+            <div className="p-3 bg-secondary/50 rounded-lg text-center">
+              <p className="text-muted-foreground">A (X)</p>
+              <p className="font-mono font-bold">{calibration.left}</p>
+            </div>
+            <div className="p-3 bg-secondary/50 rounded-lg text-center">
+              <p className="text-muted-foreground">J (X)</p>
+              <p className="font-mono font-bold">{calibration.right}</p>
+            </div>
+          </div>
+          <Button onClick={() => setShowCalibration(true)} className="w-full gap-2">
+            <Crosshair className="w-4 h-4" />
+            Открыть калибровку
+          </Button>
+        </CardContent>
+      </Card>
+
+      <GraphCalibration
+        open={showCalibration}
+        onClose={() => setShowCalibration(false)}
+        onSave={updateCalibration}
+        currentPoints={calibration}
+      />
 
       {/* Подсказки для клиента */}
       <Card>
