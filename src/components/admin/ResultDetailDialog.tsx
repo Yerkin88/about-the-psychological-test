@@ -5,12 +5,13 @@ import { useCallback, useMemo, useRef } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/components/ui/sonner';
-import { Copy, Download, User, Phone, Mail, MapPin, Calendar, Eye, MessageCircle } from 'lucide-react';
+import { Copy, Download, User, Phone, Mail, MapPin, Calendar } from 'lucide-react';
 import { questions } from '@/data/questions';
-import { AnswerType, TestResult, ScaleKey } from '@/types/oca';
+import { AnswerType, TestResult, ScaleKey, CalibrationPoints } from '@/types/oca';
  import { scaleNames } from '@/data/keys';
  import OcaGraph from './OcaGraph';
 import ocaTemplate from '@/assets/oca-template.jpg';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
  
  interface Props {
    result: TestResult | null;
@@ -19,6 +20,7 @@ import ocaTemplate from '@/assets/oca-template.jpg';
  
  export default function ResultDetailDialog({ result, onClose }: Props) {
    const graphRef = useRef<HTMLDivElement>(null);
+  const { calibration } = useAdminSettings();
 
   const safeAnswers = result?.answers ?? [];
  
@@ -77,7 +79,7 @@ import ocaTemplate from '@/assets/oca-template.jpg';
     }
   }, [buildCopyText]);
 
-  const handleDownloadJpg = useCallback(async () => {
+  const handleDownloadJpg = useCallback(async (cal: CalibrationPoints) => {
     try {
       if (!result) return;
 
@@ -107,12 +109,12 @@ import ocaTemplate from '@/assets/oca-template.jpg';
       // Рисуем фоновое изображение (шаблон)
       ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
-      // Настройки графика (те же что в OcaGraph)
+      // Настройки графика с калибровкой
       const graph = {
-        left: 116 * scale,
-        right: 1040 * scale,
-        top: 127 * scale,
-        bottom: 596 * scale,
+        left: cal.left * scale,
+        right: cal.right * scale,
+        top: cal.top * scale,
+        bottom: cal.bottom * scale,
       };
       const graphWidth = graph.right - graph.left;
       const graphHeight = graph.bottom - graph.top;
@@ -156,7 +158,7 @@ import ocaTemplate from '@/assets/oca-template.jpg';
       ctx.font = `bold ${24 * scale}px Arial, sans-serif`;
       ctx.fillStyle = '#000000';
       ctx.textAlign = 'center';
-      ctx.fillText('Результаты теста OCA', (baseW * scale) / 2, 40 * scale);
+      ctx.fillText('Результаты теста', (baseW * scale) / 2, 40 * scale);
 
       // Информация о клиенте
       ctx.font = `${18 * scale}px Arial, sans-serif`;
@@ -348,13 +350,14 @@ import ocaTemplate from '@/assets/oca-template.jpg';
                   testDate={formatDate(result.createdAt)}
                   q22Answer={result.question22Answer}
                   q197Answer={result.question197Answer}
+                calibration={calibration}
                 />
               </div>
             </div>
  
            {/* Кнопка скачивания */}
            <div className="flex justify-end gap-3">
-              <Button variant="outline" className="gap-2" onClick={handleDownloadJpg}>
+              <Button variant="outline" className="gap-2" onClick={() => handleDownloadJpg(calibration)}>
                <Download className="w-4 h-4" />
                Скачать JPG
              </Button>

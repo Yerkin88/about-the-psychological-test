@@ -105,3 +105,10 @@
    plus: { raw: number; percentile: number }[];
    minus: { raw: number; percentile: number }[];
  }
+
+export interface CalibrationPoints {
+  top: number;    // Y for +100
+  bottom: number; // Y for -100
+  left: number;   // X for scale A
+  right: number;  // X for scale J
+}
