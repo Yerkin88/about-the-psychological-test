@@ -248,10 +248,10 @@ export default function ListQuestionMode({ onComplete }: Props) {
                     key={question.id}
                     className={cn(styleClasses.questionRow, "hover:bg-white/5")}
                   >
-                    <td className={cn("w-8 text-right pr-2 align-middle", styleClasses.questionNumber)}>
+                    <td className={cn("w-6 text-right pr-1 align-middle", styleClasses.questionNumber)}>
                       {index + 1}
                     </td>
-                    <td className="w-10 text-center align-middle">
+                    <td className="w-7 text-center align-middle">
                       <button
                         onClick={() => handleAnswer(question.id, 'yes')}
                         className={cn(
@@ -266,7 +266,7 @@ export default function ListQuestionMode({ onComplete }: Props) {
                         )}
                       </button>
                     </td>
-                    <td className="w-10 text-center align-middle">
+                    <td className="w-7 text-center align-middle">
                       <button
                         onClick={() => handleAnswer(question.id, 'maybe')}
                         className={cn(
@@ -281,7 +281,7 @@ export default function ListQuestionMode({ onComplete }: Props) {
                         )}
                       </button>
                     </td>
-                    <td className="w-10 text-center align-middle">
+                    <td className="w-7 text-center align-middle">
                       <button
                         onClick={() => handleAnswer(question.id, 'no')}
                         className={cn(
@@ -296,7 +296,7 @@ export default function ListQuestionMode({ onComplete }: Props) {
                         )}
                       </button>
                     </td>
-                    <td className={cn("pl-3 align-middle", styleClasses.questionText)}>
+                    <td className={cn("pl-2 align-middle", styleClasses.questionText)}>
                       {question.text}
                     </td>
                   </tr>
