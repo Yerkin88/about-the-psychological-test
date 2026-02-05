@@ -9,6 +9,7 @@
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
  import { useTestState } from '@/hooks/useTestState';
  import { ClientInfo, Gender } from '@/types/oca';
+import DevModeButton from '@/components/test/DevModeButton';
  
  const formSchema = z.object({
    name: z.string().min(2, 'Введите имя (минимум 2 символа)'),
@@ -171,6 +172,9 @@
              </Form>
            </CardContent>
          </Card>
+        
+        {/* Кнопка режима разработчика */}
+        <DevModeButton />
        </div>
      </div>
    );
