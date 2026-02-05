@@ -4,7 +4,7 @@
  import { Input } from '@/components/ui/input';
  import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
  import { Badge } from '@/components/ui/badge';
- import { Search, Eye, Download, Trash2 } from 'lucide-react';
+import { Search, Eye, Trash2, MessageCircle, Phone } from 'lucide-react';
  import { TestResult } from '@/types/oca';
  import ResultDetailDialog from './ResultDetailDialog';
  
@@ -103,7 +103,36 @@
                    {filteredResults.map((result) => (
                      <TableRow key={result.id}>
                        <TableCell className="font-medium">
-                         {result.clientInfo.name}
+                          <div className="flex items-center gap-2">
+                            <span>{result.clientInfo.name}</span>
+                            {/* WhatsApp / Telegram кнопки */}
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => {
+                                  const phone = result.clientInfo.phone.replace(/\D/g, '');
+                                  window.open(`https://wa.me/${phone}`, '_blank');
+                                }}
+                                title="Открыть WhatsApp"
+                              >
+                               <Phone className="w-3.5 h-3.5 text-primary" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => {
+                                  const phone = result.clientInfo.phone.replace(/\D/g, '');
+                                  window.open(`https://t.me/+${phone}`, '_blank');
+                                }}
+                                title="Открыть Telegram"
+                              >
+                               <MessageCircle className="w-3.5 h-3.5 text-primary" />
+                              </Button>
+                            </div>
+                          </div>
                        </TableCell>
                        <TableCell>
                          <div className="text-sm">
@@ -125,9 +154,10 @@
                        <TableCell className="text-right">
                          <div className="flex justify-end gap-2">
                            <Button
-                             variant="ghost"
+                            variant="default"
                              size="icon"
                              onClick={() => setSelectedResult(result)}
+                            title="Просмотреть результат"
                            >
                              <Eye className="w-4 h-4" />
                            </Button>
@@ -135,6 +165,7 @@
                              variant="ghost"
                              size="icon"
                              onClick={() => handleDelete(result.id)}
+                            title="Удалить результат"
                            >
                              <Trash2 className="w-4 h-4 text-destructive" />
                            </Button>

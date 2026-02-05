@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
  import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
  import { Label } from '@/components/ui/label';
  import { Input } from '@/components/ui/input';
@@ -112,7 +113,7 @@ import { Textarea } from '@/components/ui/textarea';
          <CardHeader>
            <CardTitle>Поля регистрации</CardTitle>
            <CardDescription>
-             Настройте какие поля обязательны для заполнения
+              Настройте какие поля обязательны для заполнения или скрыты
            </CardDescription>
          </CardHeader>
          <CardContent className="space-y-4">
@@ -124,20 +125,50 @@ import { Textarea } from '@/components/ui/textarea';
              age: 'Возраст',
              gender: 'Пол',
            }).map(([key, label]) => (
-             <div key={key} className="flex items-center justify-between">
-               <Label htmlFor={key}>{label}</Label>
-               <Switch
-                 id={key}
-                 checked={settings.requiredFields[key as keyof typeof settings.requiredFields]}
-                 onCheckedChange={(checked) => 
-                   updateSettings({
-                     requiredFields: {
-                       ...settings.requiredFields,
-                       [key]: checked,
-                     },
-                   })
-                 }
-               />
+              <div key={key} className="flex items-center justify-between gap-4 py-2 border-b last:border-b-0">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor={key} className="font-medium">{label}</Label>
+                  {settings.hiddenFields[key as keyof typeof settings.hiddenFields] && (
+                    <Badge variant="secondary" className="text-xs">скрыто</Badge>
+                  )}
+                  {!settings.hiddenFields[key as keyof typeof settings.hiddenFields] && 
+                   settings.requiredFields[key as keyof typeof settings.requiredFields] && (
+                    <Badge variant="default" className="text-xs">обязательно</Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor={`${key}-required`} className="text-xs text-muted-foreground">Обязательно</Label>
+                    <Switch
+                      id={`${key}-required`}
+                      checked={settings.requiredFields[key as keyof typeof settings.requiredFields]}
+                      disabled={settings.hiddenFields[key as keyof typeof settings.hiddenFields]}
+                      onCheckedChange={(checked) => 
+                        updateSettings({
+                          requiredFields: {
+                            ...settings.requiredFields,
+                            [key]: checked,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor={`${key}-hidden`} className="text-xs text-muted-foreground">Скрыть</Label>
+                    <Switch
+                      id={`${key}-hidden`}
+                      checked={settings.hiddenFields[key as keyof typeof settings.hiddenFields]}
+                      onCheckedChange={(checked) => 
+                        updateSettings({
+                          hiddenFields: {
+                            ...settings.hiddenFields,
+                            [key]: checked,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                </div>
              </div>
            ))}
          </CardContent>
