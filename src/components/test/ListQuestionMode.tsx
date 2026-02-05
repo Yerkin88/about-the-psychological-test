@@ -73,70 +73,60 @@ import HelpTipsDialog from '@/components/HelpTipsDialog';
                  )}
                >
                  <CardContent className="p-4">
-                   <div className="flex gap-4">
-                     {/* Номер вопроса */}
-                     <div className={cn(
-                       'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0',
-                       isAnswered ? 'bg-success text-success-foreground' : 'bg-secondary text-secondary-foreground'
-                     )}>
-                       {index + 1}
-                     </div>
- 
-                     <div className="flex-1">
-                       {/* Текст вопроса */}
-                       <p className="text-foreground mb-3 leading-relaxed">
-                         {question.text}
-                       </p>
- 
-                       {/* Кнопки ответов */}
-                      <div className="flex gap-2">
+                    <div className="space-y-3">
+                      {/* Текст вопроса */}
+                      <p className="text-foreground leading-relaxed font-medium">
+                        <span className="text-primary font-semibold">{index + 1}. </span>{question.text}
+                      </p>
+
+                      {/* Кнопки ответов */}
+                      <div className="flex gap-1.5 sm:gap-2">
                         <button
                           onClick={() => handleAnswer(question.id, 'yes')}
                           className={cn(
-                            'flex-1 py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200',
-                            'flex items-center justify-center gap-1.5',
+                            'flex-1 min-w-0 py-2 px-1.5 sm:px-3 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200',
+                            'flex items-center justify-center gap-1',
                             'active:scale-95 touch-manipulation',
                             answer === 'yes'
-                              ? 'bg-success text-success-foreground shadow-md'
-                              : 'bg-success/10 text-success hover:bg-success/20 border border-success/30'
+                              ? 'bg-success text-white shadow-md'
+                              : 'bg-success/10 text-success hover:bg-success/20 border border-success/30 dark:text-success'
                           )}
                         >
-                          <Check className="w-4 h-4" />
-                          <span>Да</span>
+                          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="truncate">Да</span>
                         </button>
 
                         <button
                           onClick={() => handleAnswer(question.id, 'maybe')}
                           className={cn(
-                            'flex-1 py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200',
-                            'flex items-center justify-center gap-1.5',
+                            'flex-1 min-w-0 py-2 px-1.5 sm:px-3 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200',
+                            'flex items-center justify-center gap-1',
                             'active:scale-95 touch-manipulation',
                             answer === 'maybe'
-                              ? 'bg-warning text-warning-foreground shadow-md'
-                              : 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30'
+                              ? 'bg-warning text-white shadow-md'
+                              : 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30 dark:text-warning'
                           )}
                         >
-                          <Minus className="w-4 h-4" />
-              <span>Может быть</span>
+                          <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="truncate">Может быть</span>
                         </button>
 
                         <button
                           onClick={() => handleAnswer(question.id, 'no')}
                           className={cn(
-                            'flex-1 py-2 px-3 rounded-lg font-medium text-sm transition-all duration-200',
-                            'flex items-center justify-center gap-1.5',
+                            'flex-1 min-w-0 py-2 px-1.5 sm:px-3 rounded-lg font-medium text-xs sm:text-sm transition-all duration-200',
+                            'flex items-center justify-center gap-1',
                             'active:scale-95 touch-manipulation',
                             answer === 'no'
-                              ? 'bg-destructive text-destructive-foreground shadow-md'
-                              : 'bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/30'
+                              ? 'bg-destructive text-white shadow-md'
+                              : 'bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/30 dark:text-destructive'
                           )}
                         >
-                          <X className="w-4 h-4" />
-                          <span>Нет</span>
+                          <X className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                          <span className="truncate">Нет</span>
                         </button>
-                       </div>
-                     </div>
-                   </div>
+                      </div>
+                    </div>
                  </CardContent>
                </Card>
              );
