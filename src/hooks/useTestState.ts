@@ -1,4 +1,4 @@
- import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
  import { Answer, AnswerType, ClientInfo, DisplayMode, RawScores, Percentiles, ScaleKey, TestResult } from '@/types/oca';
  import { questions } from '@/data/questions';
  import { getQuestionKey } from '@/data/keys';
@@ -45,11 +45,20 @@
  
    // Установка данных клиента
    const setClientInfo = useCallback((info: ClientInfo) => {
-     setState(prev => ({
-       ...prev,
-       clientInfo: info,
-       startTime: new Date(),
-     }));
+    // ВАЖНО: пишем в localStorage синхронно до перехода на /test,
+    // иначе /test может успеть смонтироваться и отредиректить обратно на /register.
+    const next: TestState = {
+      ...initialState,
+      clientInfo: info,
+      startTime: new Date(),
+      currentQuestionIndex: 0,
+    };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+    setState(next);
    }, []);
  
    // Ответ на вопрос
@@ -196,12 +205,20 @@
        answer: answerTypes[Math.floor(Math.random() * 3)],
      }));
  
-     setState({
+    const next: TestState = {
        clientInfo: randomClientInfo,
        answers: randomAnswers,
        startTime: new Date(Date.now() - 30 * 60 * 1000), // 30 минут назад
        currentQuestionIndex: questions.length - 1,
-     });
+    };
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+
+    setState(next);
    }, []);
  
    return {

@@ -11,12 +11,18 @@
  import { ClientInfo, Gender } from '@/types/oca';
 import DevModeButton from '@/components/test/DevModeButton';
  
- const formSchema = z.object({
+  const formSchema = z.object({
    name: z.string().min(2, 'Введите имя (минимум 2 символа)'),
    phone: z.string().min(10, 'Введите корректный номер телефона'),
    email: z.string().email('Введите корректный email'),
    city: z.string().optional(),
-   age: z.number().min(14, 'Минимальный возраст 14 лет').max(100, 'Максимальный возраст 100 лет'),
+    age: z.preprocess(
+      (v) => (v === '' || v === null || v === undefined ? undefined : v),
+      z.coerce
+        .number({ invalid_type_error: 'Введите возраст' })
+        .min(14, 'Минимальный возраст 14 лет')
+        .max(100, 'Максимальный возраст 100 лет'),
+    ),
    gender: z.enum(['male', 'female'], { required_error: 'Выберите пол' }),
  });
  
@@ -134,7 +140,7 @@ import DevModeButton from '@/components/test/DevModeButton';
                              type="number" 
                              placeholder="Возраст" 
                              {...field}
-                             onChange={e => field.onChange(parseInt(e.target.value) || '')}
+                              onChange={(e) => field.onChange(e.target.value)}
                            />
                          </FormControl>
                          <FormMessage />
