@@ -1,19 +1,19 @@
- import { Moon, Sun } from 'lucide-react';
- import { useTheme } from 'next-themes';
- import { Button } from '@/components/ui/button';
- import { useEffect, useState } from 'react';
- 
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
+
 interface Props {
   className?: string;
 }
 
 export default function ThemeToggle({ className }: Props) {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
  
-   useEffect(() => {
-     setMounted(true);
-   }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
  
   if (!mounted) {
     return (
@@ -24,7 +24,8 @@ export default function ThemeToggle({ className }: Props) {
     );
   }
  
-   const isDark = theme === 'dark';
+  // Используем resolvedTheme для корректного определения текущей темы
+  const isDark = resolvedTheme === 'dark';
  
   return (
     <Button
@@ -37,4 +38,4 @@ export default function ThemeToggle({ className }: Props) {
       <span className="hidden sm:inline">{isDark ? 'Светлый режим' : 'Тёмный режим'}</span>
     </Button>
   );
- }
+}

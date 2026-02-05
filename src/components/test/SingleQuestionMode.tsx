@@ -133,12 +133,15 @@ import { cn } from '@/lib/utils';
          case 'Т':
            handleAnswer('no');
            break;
-         case 'ArrowLeft':
-           prevQuestion();
-           break;
-         case 'ArrowRight':
-           nextQuestion();
-           break;
+          case 'ArrowLeft':
+            prevQuestion();
+            break;
+          case 'ArrowRight':
+            // Блокируем переход вперёд если нет ответа
+            if (currentAnswer) {
+              nextQuestion();
+            }
+            break;
        }
      };
  
@@ -257,7 +260,7 @@ import { cn } from '@/lib/utils';
         {settings.testStyle === 'apple' && (
           <button
             onClick={nextQuestion}
-            disabled={currentQuestionIndex === totalQuestions - 1}
+            disabled={currentQuestionIndex === totalQuestions - 1 || !currentAnswer}
             className={cn(
               "hidden md:flex items-center justify-center w-12 h-12 ml-8",
               "text-white/50 hover:text-white transition-colors disabled:opacity-30"
@@ -300,7 +303,7 @@ import { cn } from '@/lib/utils';
               <Button
                 variant="ghost"
                 onClick={nextQuestion}
-                disabled={currentQuestionIndex === totalQuestions - 1}
+                disabled={currentQuestionIndex === totalQuestions - 1 || !currentAnswer}
                 size="sm"
                 className="text-white/70 hover:text-white hover:bg-white/10"
               >
@@ -328,7 +331,7 @@ import { cn } from '@/lib/utils';
                 <Button
                   variant="outline"
                   onClick={nextQuestion}
-                  disabled={currentQuestionIndex === totalQuestions - 1}
+                  disabled={currentQuestionIndex === totalQuestions - 1 || !currentAnswer}
                   size="sm"
                   className="md:size-default"
                 >
