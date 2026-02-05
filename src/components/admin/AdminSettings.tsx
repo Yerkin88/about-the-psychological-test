@@ -9,11 +9,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Crosshair } from 'lucide-react';
  import { useAdminSettings } from '@/hooks/useAdminSettings';
- import { DisplayMode } from '@/types/oca';
+import { DisplayMode, TestStyle } from '@/types/oca';
 import GraphCalibration from './GraphCalibration';
  
  export default function AdminSettings() {
-  const { settings, updateSettings, setDisplayMode, calibration, updateCalibration } = useAdminSettings();
+  const { settings, updateSettings, setDisplayMode, setTestStyle, calibration, updateCalibration } = useAdminSettings();
   const [showCalibration, setShowCalibration] = useState(false);
  
    return (
@@ -61,6 +61,59 @@ import GraphCalibration from './GraphCalibration';
          </CardContent>
        </Card>
  
+      {/* Стиль интерфейса теста */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Стиль интерфейса теста</CardTitle>
+          <CardDescription>
+            Выберите визуальный стиль для прохождения теста
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup
+            value={settings.testStyle}
+            onValueChange={(value) => setTestStyle(value as TestStyle)}
+            className="space-y-4"
+          >
+            <div className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-secondary/50 transition-colors">
+              <RadioGroupItem value="default" id="style-default" className="mt-1" />
+              <div>
+                <Label htmlFor="style-default" className="font-medium cursor-pointer">
+                  По умолчанию
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Классический стиль с цветными кнопками и иконками
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-secondary/50 transition-colors">
+              <RadioGroupItem value="apple" id="style-apple" className="mt-1" />
+              <div>
+                <Label htmlFor="style-apple" className="font-medium cursor-pointer">
+                  Стиль Apple
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Минималистичный стиль с градиентным фоном и элегантными кнопками. Крупный номер вопроса.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-secondary/50 transition-colors">
+              <RadioGroupItem value="minimal" id="style-minimal" className="mt-1" />
+              <div>
+                <Label htmlFor="style-minimal" className="font-medium cursor-pointer">
+                  Минимализм
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Простой и чистый дизайн без отвлекающих элементов
+                </p>
+              </div>
+            </div>
+          </RadioGroup>
+        </CardContent>
+      </Card>
+
        {/* Telegram настройки */}
        <Card>
          <CardHeader>

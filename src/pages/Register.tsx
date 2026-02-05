@@ -88,7 +88,7 @@ export default function Register() {
     };
     
     setClientInfo(clientInfo);
-    navigate('/test');
+    navigate('/instructions');
   };
 
   return (

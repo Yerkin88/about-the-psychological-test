@@ -117,7 +117,7 @@ import HelpTipsDialog from '@/components/HelpTipsDialog';
                           )}
                         >
                           <Minus className="w-4 h-4" />
-                          <span>Может</span>
+              <span>Может быть</span>
                         </button>
 
                         <button
