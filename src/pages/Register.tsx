@@ -8,29 +8,56 @@
  import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
  import { useTestState } from '@/hooks/useTestState';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
  import { ClientInfo, Gender } from '@/types/oca';
 import DevModeButton from '@/components/test/DevModeButton';
- 
-  const formSchema = z.object({
-   name: z.string().min(2, 'Введите имя (минимум 2 символа)'),
-   phone: z.string().min(10, 'Введите корректный номер телефона'),
-   email: z.string().email('Введите корректный email'),
-   city: z.string().optional(),
-    age: z.preprocess(
-      (v) => (v === '' || v === null || v === undefined ? undefined : v),
-      z.coerce
-        .number({ invalid_type_error: 'Введите возраст' })
-        .min(14, 'Минимальный возраст 14 лет')
-        .max(100, 'Максимальный возраст 100 лет'),
-    ),
-   gender: z.enum(['male', 'female'], { required_error: 'Выберите пол' }),
- });
- 
- type FormData = z.infer<typeof formSchema>;
  
  export default function Register() {
    const navigate = useNavigate();
    const { setClientInfo } = useTestState();
+  const { settings } = useAdminSettings();
+  const { requiredFields, hiddenFields } = settings;
+
+  // Динамическая схема на основе настроек админки
+  const formSchema = z.object({
+    name: hiddenFields.name 
+      ? z.string().optional()
+      : requiredFields.name 
+        ? z.string().min(2, 'Введите имя (минимум 2 символа)')
+        : z.string().optional(),
+    phone: hiddenFields.phone
+      ? z.string().optional()
+      : requiredFields.phone
+        ? z.string().min(10, 'Введите корректный номер телефона')
+        : z.string().optional(),
+    email: hiddenFields.email
+      ? z.string().optional()
+      : requiredFields.email
+        ? z.string().email('Введите корректный email')
+        : z.string().email().optional().or(z.literal('')),
+    city: z.string().optional(),
+    age: hiddenFields.age
+      ? z.any().optional()
+      : requiredFields.age
+        ? z.preprocess(
+            (v) => (v === '' || v === null || v === undefined ? undefined : v),
+            z.coerce
+              .number({ invalid_type_error: 'Введите возраст' })
+              .min(14, 'Минимальный возраст 14 лет')
+              .max(100, 'Максимальный возраст 100 лет'),
+          )
+        : z.preprocess(
+            (v) => (v === '' || v === null || v === undefined ? undefined : v),
+            z.coerce.number().optional(),
+          ),
+    gender: hiddenFields.gender
+      ? z.enum(['male', 'female']).optional()
+      : requiredFields.gender
+        ? z.enum(['male', 'female'], { required_error: 'Выберите пол' })
+        : z.enum(['male', 'female']).optional(),
+  });
+
+  type FormData = z.infer<typeof formSchema>;
  
    const form = useForm<FormData>({
      resolver: zodResolver(formSchema),
@@ -46,12 +73,12 @@ import DevModeButton from '@/components/test/DevModeButton';
  
    const onSubmit = (data: FormData) => {
      const clientInfo: ClientInfo = {
-       name: data.name,
-       phone: data.phone,
-       email: data.email,
+      name: data.name || '',
+      phone: data.phone || '',
+      email: data.email || '',
        city: data.city || '',
-       age: data.age,
-       gender: data.gender as Gender,
+      age: data.age || 0,
+      gender: (data.gender as Gender) || 'male',
      };
      
      setClientInfo(clientInfo);
@@ -72,12 +99,13 @@ import DevModeButton from '@/components/test/DevModeButton';
            <CardContent>
              <Form {...form}>
                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                 <FormField
+                 {!hiddenFields.name && (
+                  <FormField
                    control={form.control}
                    name="name"
                    render={({ field }) => (
                      <FormItem>
-                       <FormLabel>Имя *</FormLabel>
+                        <FormLabel>Имя {requiredFields.name && '*'}</FormLabel>
                        <FormControl>
                          <Input placeholder="Введите ваше имя" {...field} />
                        </FormControl>
@@ -85,13 +113,15 @@ import DevModeButton from '@/components/test/DevModeButton';
                      </FormItem>
                    )}
                  />
+                 )}
  
-                 <FormField
+                 {!hiddenFields.phone && (
+                  <FormField
                    control={form.control}
                    name="phone"
                    render={({ field }) => (
                      <FormItem>
-                       <FormLabel>Телефон *</FormLabel>
+                        <FormLabel>Телефон {requiredFields.phone && '*'}</FormLabel>
                        <FormControl>
                          <Input placeholder="+7 (999) 123-45-67" {...field} />
                        </FormControl>
@@ -99,13 +129,15 @@ import DevModeButton from '@/components/test/DevModeButton';
                      </FormItem>
                    )}
                  />
+                 )}
  
-                 <FormField
+                 {!hiddenFields.email && (
+                  <FormField
                    control={form.control}
                    name="email"
                    render={({ field }) => (
                      <FormItem>
-                       <FormLabel>Email *</FormLabel>
+                        <FormLabel>Email {requiredFields.email && '*'}</FormLabel>
                        <FormControl>
                          <Input type="email" placeholder="example@mail.com" {...field} />
                        </FormControl>
@@ -113,13 +145,15 @@ import DevModeButton from '@/components/test/DevModeButton';
                      </FormItem>
                    )}
                  />
+                 )}
  
-                 <FormField
+                 {!hiddenFields.city && (
+                  <FormField
                    control={form.control}
                    name="city"
                    render={({ field }) => (
                      <FormItem>
-                       <FormLabel>Город</FormLabel>
+                        <FormLabel>Город {requiredFields.city && '*'}</FormLabel>
                        <FormControl>
                          <Input placeholder="Ваш город" {...field} />
                        </FormControl>
@@ -127,14 +161,16 @@ import DevModeButton from '@/components/test/DevModeButton';
                      </FormItem>
                    )}
                  />
+                 )}
  
                  <div className="grid grid-cols-2 gap-4">
-                   <FormField
+                    {!hiddenFields.age && (
+                     <FormField
                      control={form.control}
                      name="age"
                      render={({ field }) => (
                        <FormItem>
-                         <FormLabel>Возраст *</FormLabel>
+                          <FormLabel>Возраст {requiredFields.age && '*'}</FormLabel>
                          <FormControl>
                            <Input 
                              type="number" 
@@ -147,13 +183,15 @@ import DevModeButton from '@/components/test/DevModeButton';
                        </FormItem>
                      )}
                    />
+                    )}
  
-                   <FormField
+                    {!hiddenFields.gender && (
+                     <FormField
                      control={form.control}
                      name="gender"
                      render={({ field }) => (
                        <FormItem>
-                         <FormLabel>Пол *</FormLabel>
+                          <FormLabel>Пол {requiredFields.gender && '*'}</FormLabel>
                          <Select onValueChange={field.onChange} value={field.value}>
                            <FormControl>
                              <SelectTrigger>
@@ -169,6 +207,7 @@ import DevModeButton from '@/components/test/DevModeButton';
                        </FormItem>
                      )}
                    />
+                    )}
                  </div>
  
                  <Button type="submit" size="lg" className="w-full mt-6">

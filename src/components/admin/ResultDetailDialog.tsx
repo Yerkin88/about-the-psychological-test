@@ -5,11 +5,12 @@ import { useCallback, useMemo, useRef } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/components/ui/sonner';
-import { Copy, Download, User, Phone, Mail, MapPin, Calendar } from 'lucide-react';
+import { Copy, Download, User, Phone, Mail, MapPin, Calendar, Eye, MessageCircle } from 'lucide-react';
 import { questions } from '@/data/questions';
 import { AnswerType, TestResult, ScaleKey } from '@/types/oca';
  import { scaleNames } from '@/data/keys';
  import OcaGraph from './OcaGraph';
+import ocaTemplate from '@/assets/oca-template.jpg';
  
  interface Props {
    result: TestResult | null;
@@ -79,56 +80,10 @@ import { AnswerType, TestResult, ScaleKey } from '@/types/oca';
   const handleDownloadJpg = useCallback(async () => {
     try {
       if (!result) return;
-      const container = graphRef.current;
-      const svg = container?.querySelector('svg') as SVGSVGElement | null;
-      if (!svg) {
-        toast.error('График не найден');
-        return;
-      }
 
-      const cloned = svg.cloneNode(true) as SVGSVGElement;
-
-      // Прокидываем CSS-переменные темы внутрь SVG, чтобы `hsl(var(--...))` корректно отрисовалось при экспорте
-      const rootStyles = getComputedStyle(document.documentElement);
-      const cssVars = ['--primary', '--foreground', '--muted-foreground', '--border', '--background'];
-      cssVars.forEach((v) => cloned.style.setProperty(v, rootStyles.getPropertyValue(v).trim()));
-      cloned.style.fontFamily = getComputedStyle(svg).fontFamily;
-
-      // Встраиваем минимальные стили Tailwind-классов, которые используются внутри SVG
-      const styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-      styleEl.textContent = `
-        text { font-family: ${getComputedStyle(svg).fontFamily}; }
-        .text-xs { font-size: 12px; }
-        .text-sm { font-size: 14px; }
-        .text-lg { font-size: 18px; }
-        .font-medium { font-weight: 500; }
-        .font-semibold { font-weight: 600; }
-        .font-bold { font-weight: 700; }
-        .fill-foreground { fill: hsl(var(--foreground)); }
-        .fill-muted-foreground { fill: hsl(var(--muted-foreground)); }
-        .fill-primary { fill: hsl(var(--primary)); }
-      `;
-      cloned.insertBefore(styleEl, cloned.firstChild);
-
-      if (!cloned.getAttribute('xmlns')) {
-        cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      }
-
-      const serializer = new XMLSerializer();
-      const svgString = serializer.serializeToString(cloned);
-      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
-
-      const img = new Image();
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error('image_load_failed'));
-        img.src = url;
-      });
-
-      const vb = svg.viewBox?.baseVal;
-      const baseW = vb?.width || 800;
-      const baseH = vb?.height || 500;
+      // Размеры шаблона
+      const baseW = 1156;
+      const baseH = 842;
       const scale = 2;
 
       const canvas = document.createElement('canvas');
@@ -137,12 +92,96 @@ import { AnswerType, TestResult, ScaleKey } from '@/types/oca';
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('no_canvas');
 
-      const bgVar = rootStyles.getPropertyValue('--background').trim();
-      ctx.fillStyle = bgVar ? `hsl(${bgVar})` : '#ffffff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      // Сначала загружаем фоновое изображение шаблона
+      const bgImg = new Image();
+      await new Promise<void>((resolve, reject) => {
+        bgImg.onload = () => resolve();
+        bgImg.onerror = () => reject(new Error('bg_load_failed'));
+        bgImg.src = ocaTemplate;
+      });
 
-      URL.revokeObjectURL(url);
+      // Рисуем белый фон
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Рисуем фоновое изображение (шаблон)
+      ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+
+      // Настройки графика (те же что в OcaGraph)
+      const graph = {
+        left: 116 * scale,
+        right: 1040 * scale,
+        top: 127 * scale,
+        bottom: 596 * scale,
+      };
+      const graphWidth = graph.right - graph.left;
+      const graphHeight = graph.bottom - graph.top;
+      const scales: ScaleKey[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+      const xStep = graphWidth / (scales.length - 1);
+
+      const yScale = (value: number) => {
+        const normalized = (100 - value) / 200;
+        return graph.top + normalized * graphHeight;
+      };
+
+      // Рисуем линию графика
+      ctx.beginPath();
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 3 * scale;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      scales.forEach((s, i) => {
+        const x = graph.left + i * xStep;
+        const y = yScale(result.percentiles[s]);
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      ctx.stroke();
+
+      // Рисуем точки
+      scales.forEach((s, i) => {
+        const x = graph.left + i * xStep;
+        const y = yScale(result.percentiles[s]);
+        ctx.beginPath();
+        ctx.fillStyle = '#000000';
+        ctx.arc(x, y, 7 * scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Заголовок "Результаты теста OCA"
+      ctx.font = `bold ${24 * scale}px Arial, sans-serif`;
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'center';
+      ctx.fillText('Результаты теста OCA', (baseW * scale) / 2, 40 * scale);
+
+      // Информация о клиенте
+      ctx.font = `${18 * scale}px Arial, sans-serif`;
+      const infoText = `${result.clientInfo.name}   |   ${result.clientInfo.age} лет   |   ${formatDate(result.createdAt)}`;
+      ctx.fillText(infoText, (baseW * scale) / 2, 75 * scale);
+
+      // Значения шкал A-J
+      ctx.font = `bold ${16 * scale}px Arial, sans-serif`;
+      const valuesLine = scales
+        .map((s) => `${s}:${result.percentiles[s] > 0 ? '+' : ''}${result.percentiles[s]}`)
+        .join('   ');
+      ctx.fillText(valuesLine, (baseW * scale) / 2, 780 * scale);
+
+      // Q22/Q197 — только если положительные
+      const showQ22 = result.question22Answer === 'yes';
+      const showQ197 = result.question197Answer === 'yes';
+      if (showQ22 || showQ197) {
+        ctx.font = `${14 * scale}px Arial, sans-serif`;
+        ctx.fillStyle = '#333333';
+        let qText = '';
+        if (showQ22) qText += 'Q22: +';
+        if (showQ22 && showQ197) qText += '   ';
+        if (showQ197) qText += 'Q197: +';
+        ctx.fillText(qText, (baseW * scale) / 2, 810 * scale);
+      }
 
       const filename = `OCA_${result.clientInfo.name}_${formatDate(result.createdAt)}`
         .replace(/[\\/:*?"<>|]+/g, '_')
@@ -314,8 +353,8 @@ import { AnswerType, TestResult, ScaleKey } from '@/types/oca';
             </div>
  
            {/* Кнопка скачивания */}
-           <div className="flex justify-end">
-              <Button className="gap-2" onClick={handleDownloadJpg}>
+           <div className="flex justify-end gap-3">
+              <Button variant="outline" className="gap-2" onClick={handleDownloadJpg}>
                <Download className="w-4 h-4" />
                Скачать JPG
              </Button>

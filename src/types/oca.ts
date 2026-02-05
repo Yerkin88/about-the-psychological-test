@@ -89,6 +89,14 @@
      age: boolean;
      gender: boolean;
    };
+  hiddenFields: {
+    name: boolean;
+    phone: boolean;
+    email: boolean;
+    city: boolean;
+    age: boolean;
+    gender: boolean;
+  };
   helpTips: string; // Подсказки для клиента (редактируемые в админке)
  }
  
