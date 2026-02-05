@@ -4,9 +4,13 @@
  import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
  import { useAdminSettings } from '@/hooks/useAdminSettings';
  
- export default function HelpTipsDialog() {
-   const [open, setOpen] = useState(false);
-   const { settings } = useAdminSettings();
+interface Props {
+  className?: string;
+}
+
+export default function HelpTipsDialog({ className }: Props) {
+  const [open, setOpen] = useState(false);
+  const { settings } = useAdminSettings();
  
    // Простой парсинг markdown для отображения
    const renderContent = (text: string) => {
@@ -53,11 +57,11 @@
  
    return (
      <Dialog open={open} onOpenChange={setOpen}>
-       <DialogTrigger asChild>
-         <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-           <HelpCircle className="w-5 h-5" />
-         </Button>
-       </DialogTrigger>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className={className || "text-muted-foreground hover:text-foreground"}>
+          <HelpCircle className="w-5 h-5" />
+        </Button>
+      </DialogTrigger>
        <DialogContent className="max-w-md">
          <DialogHeader>
            <DialogTitle>Помощь</DialogTitle>
