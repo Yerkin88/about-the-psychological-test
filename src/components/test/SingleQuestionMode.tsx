@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useMemo } from 'react';
- import { Button } from '@/components/ui/button';
  import { Card, CardContent } from '@/components/ui/card';
  import { Progress } from '@/components/ui/progress';
+ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Check, Minus, X } from 'lucide-react';
  import { useTestState } from '@/hooks/useTestState';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -42,15 +42,15 @@ import { cn } from '@/lib/utils';
           container: 'min-h-screen flex flex-col bg-gradient-to-b from-[hsl(var(--primary)/0.1)] via-background to-[hsl(var(--primary)/0.05)]',
           header: 'backdrop-blur-md bg-background/80 border-b p-3 md:p-4',
           card: 'w-full max-w-3xl bg-transparent border-0 shadow-none',
-          questionNumber: 'text-6xl md:text-7xl font-light text-primary/80',
+          questionNumber: 'text-primary/80 font-light',
           questionText: 'text-xl md:text-2xl lg:text-3xl text-foreground text-center leading-relaxed font-normal',
-          buttonBase: 'py-4 md:py-5 px-6 md:px-10 rounded-full font-medium text-base md:text-lg transition-all duration-300 border-2',
-          buttonYes: 'border-success/50 hover:bg-success hover:text-success-foreground hover:border-success',
-          buttonYesActive: 'bg-success text-success-foreground border-success shadow-lg',
-          buttonMaybe: 'border-warning/50 hover:bg-warning hover:text-warning-foreground hover:border-warning',
-          buttonMaybeActive: 'bg-warning text-warning-foreground border-warning shadow-lg',
-          buttonNo: 'border-destructive/50 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive',
-          buttonNoActive: 'bg-destructive text-destructive-foreground border-destructive shadow-lg',
+          buttonBase: 'flex-1 min-w-0 py-2.5 md:py-4 px-2 md:px-6 rounded-full font-medium text-xs md:text-base transition-all duration-300 border-2',
+          buttonYes: 'border-success/50 text-success hover:bg-success hover:text-white hover:border-success dark:text-success dark:hover:text-white',
+          buttonYesActive: 'bg-success text-white border-success shadow-lg',
+          buttonMaybe: 'border-warning/50 text-warning hover:bg-warning hover:text-white hover:border-warning dark:text-warning dark:hover:text-white',
+          buttonMaybeActive: 'bg-warning text-white border-warning shadow-lg',
+          buttonNo: 'border-destructive/50 text-destructive hover:bg-destructive hover:text-white hover:border-destructive dark:text-destructive dark:hover:text-white',
+          buttonNoActive: 'bg-destructive text-white border-destructive shadow-lg',
           footer: 'backdrop-blur-md bg-background/80 border-t p-3 md:p-4',
           progressLabel: 'text-sm uppercase tracking-wider text-muted-foreground',
           showIcons: false,
@@ -60,15 +60,15 @@ import { cn } from '@/lib/utils';
           container: 'min-h-screen flex flex-col bg-background',
           header: 'bg-card border-b p-3 md:p-4',
           card: 'w-full max-w-2xl shadow-none border-0 md:border md:shadow-sm',
-          questionNumber: 'text-sm text-muted-foreground mb-2',
+          questionNumber: 'text-muted-foreground',
           questionText: 'text-lg md:text-xl text-foreground text-center leading-relaxed font-normal',
-          buttonBase: 'py-3 md:py-4 px-6 md:px-8 rounded-lg font-medium text-sm md:text-base transition-all duration-200 border',
-          buttonYes: 'border-border hover:border-success hover:bg-success/10',
-          buttonYesActive: 'bg-success text-success-foreground border-success',
-          buttonMaybe: 'border-border hover:border-warning hover:bg-warning/10',
-          buttonMaybeActive: 'bg-warning text-warning-foreground border-warning',
-          buttonNo: 'border-border hover:border-destructive hover:bg-destructive/10',
-          buttonNoActive: 'bg-destructive text-destructive-foreground border-destructive',
+          buttonBase: 'flex-1 min-w-0 py-2.5 md:py-3 px-2 md:px-6 rounded-lg font-medium text-xs md:text-sm transition-all duration-200 border',
+          buttonYes: 'border-border text-foreground hover:border-success hover:bg-success/10 dark:text-foreground',
+          buttonYesActive: 'bg-success text-white border-success',
+          buttonMaybe: 'border-border text-foreground hover:border-warning hover:bg-warning/10 dark:text-foreground',
+          buttonMaybeActive: 'bg-warning text-white border-warning',
+          buttonNo: 'border-border text-foreground hover:border-destructive hover:bg-destructive/10 dark:text-foreground',
+          buttonNoActive: 'bg-destructive text-white border-destructive',
           footer: 'bg-card border-t p-3 md:p-4',
           progressLabel: 'text-sm text-muted-foreground',
           showIcons: false,
@@ -78,15 +78,15 @@ import { cn } from '@/lib/utils';
           container: 'min-h-screen flex flex-col bg-background',
           header: 'bg-card border-b p-3 md:p-4',
           card: 'w-full max-w-2xl shadow-lg border-0 md:border',
-          questionNumber: 'text-lg md:text-xl text-primary font-semibold',
+          questionNumber: 'text-primary font-semibold',
           questionText: 'text-2xl md:text-3xl text-foreground text-center leading-relaxed font-semibold',
-          buttonBase: 'py-3 md:py-4 px-4 md:px-6 rounded-xl font-semibold text-sm md:text-base transition-all duration-200',
-          buttonYes: 'bg-success/10 text-success hover:bg-success/20 border border-success/30',
-          buttonYesActive: 'bg-success text-success-foreground shadow-lg ring-2 ring-success/50',
-          buttonMaybe: 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30',
-          buttonMaybeActive: 'bg-warning text-warning-foreground shadow-lg ring-2 ring-warning/50',
-          buttonNo: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/30',
-          buttonNoActive: 'bg-destructive text-destructive-foreground shadow-lg ring-2 ring-destructive/50',
+          buttonBase: 'flex-1 min-w-0 py-2.5 md:py-3 px-2 md:px-4 rounded-xl font-semibold text-xs md:text-sm transition-all duration-200',
+          buttonYes: 'bg-success/10 text-success hover:bg-success/20 border border-success/30 dark:text-success',
+          buttonYesActive: 'bg-success text-white shadow-lg ring-2 ring-success/50',
+          buttonMaybe: 'bg-warning/10 text-warning hover:bg-warning/20 border border-warning/30 dark:text-warning',
+          buttonMaybeActive: 'bg-warning text-white shadow-lg ring-2 ring-warning/50',
+          buttonNo: 'bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/30 dark:text-destructive',
+          buttonNoActive: 'bg-destructive text-white shadow-lg ring-2 ring-destructive/50',
           footer: 'bg-card border-t p-3 md:p-4',
           progressLabel: 'text-sm text-muted-foreground',
           showIcons: true,
@@ -171,23 +171,21 @@ import { cn } from '@/lib/utils';
         <Card className={styleClasses.card}>
           <CardContent className="p-4 md:p-8 space-y-6 md:space-y-8">
             {/* Номер и текст вопроса - главный фокус */}
-            <div className="text-center space-y-3 md:space-y-4">
-              <span className={styleClasses.questionNumber}>
-                {currentQuestionIndex + 1}.
-              </span>
+            <div className="text-center">
               <p className={styleClasses.questionText}>
-               {currentQuestion.text}
+                <span className={styleClasses.questionNumber}>{currentQuestionIndex + 1}. </span>
+                {currentQuestion.text}
               </p>
             </div>
  
              {/* Кнопки ответов */}
-            <div className="flex gap-3 md:gap-4 justify-center flex-wrap">
+            <div className="flex gap-2 md:gap-3 justify-center w-full">
               {/* Да */}
               <button
                 onClick={() => handleAnswer('yes')}
                 className={cn(
                   styleClasses.buttonBase,
-                  'flex items-center justify-center gap-1.5 md:gap-2',
+                  'flex items-center justify-center gap-1 md:gap-2',
                   'active:scale-95 touch-manipulation',
                   currentAnswer === 'yes'
                     ? styleClasses.buttonYesActive
@@ -195,7 +193,7 @@ import { cn } from '@/lib/utils';
                 )}
               >
                 {styleClasses.showIcons && <Check className="w-4 h-4 md:w-5 md:h-5" />}
-                <span>Да</span>
+                <span className="truncate">Да</span>
               </button>
 
               {/* Может быть */}
@@ -203,7 +201,7 @@ import { cn } from '@/lib/utils';
                 onClick={() => handleAnswer('maybe')}
                 className={cn(
                   styleClasses.buttonBase,
-                  'flex items-center justify-center gap-1.5 md:gap-2',
+                  'flex items-center justify-center gap-1 md:gap-2',
                   'active:scale-95 touch-manipulation',
                   currentAnswer === 'maybe'
                     ? styleClasses.buttonMaybeActive
@@ -211,7 +209,7 @@ import { cn } from '@/lib/utils';
                 )}
               >
                 {styleClasses.showIcons && <Minus className="w-4 h-4 md:w-5 md:h-5" />}
-                <span>Может быть</span>
+                <span className="truncate">Может быть</span>
               </button>
 
               {/* Нет */}
@@ -219,7 +217,7 @@ import { cn } from '@/lib/utils';
                 onClick={() => handleAnswer('no')}
                 className={cn(
                   styleClasses.buttonBase,
-                  'flex items-center justify-center gap-1.5 md:gap-2',
+                  'flex items-center justify-center gap-1 md:gap-2',
                   'active:scale-95 touch-manipulation',
                   currentAnswer === 'no'
                     ? styleClasses.buttonNoActive
@@ -227,7 +225,7 @@ import { cn } from '@/lib/utils';
                 )}
               >
                 {styleClasses.showIcons && <X className="w-4 h-4 md:w-5 md:h-5" />}
-                <span>Нет</span>
+                <span className="truncate">Нет</span>
               </button>
              </div>
            </CardContent>
