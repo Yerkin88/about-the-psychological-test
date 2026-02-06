@@ -1,23 +1,35 @@
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
- import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
- import { Label } from '@/components/ui/label';
- import { Input } from '@/components/ui/input';
- import { Switch } from '@/components/ui/switch';
- import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Crosshair } from 'lucide-react';
- import { useAdminSettings } from '@/hooks/useAdminSettings';
+import { toast } from '@/components/ui/sonner';
+import { Crosshair, Save } from 'lucide-react';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { DisplayMode, TestStyle } from '@/types/oca';
 import GraphCalibration from './GraphCalibration';
  
- export default function AdminSettings() {
-  const { settings, updateSettings, setDisplayMode, setTestStyle, calibration, updateCalibration } = useAdminSettings();
+export default function AdminSettings() {
+  const { settings, updateSettings, setDisplayMode, setTestStyle, calibration, updateCalibration, saveAll } = useAdminSettings();
   const [showCalibration, setShowCalibration] = useState(false);
- 
-   return (
-     <div className="space-y-6">
+
+  const handleSave = () => {
+    const ok = saveAll();
+    ok ? toast.success('Настройки сохранены') : toast.error('Не удалось сохранить настройки');
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-end">
+        <Button onClick={handleSave} className="gap-2">
+          <Save className="w-4 h-4" />
+          Сохранить настройки
+        </Button>
+      </div>
        {/* Режим отображения вопросов */}
        <Card>
          <CardHeader>

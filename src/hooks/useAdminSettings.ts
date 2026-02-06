@@ -1,7 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { AdminSettings, DisplayMode, TestStyle, CalibrationPoints } from '@/types/oca';
- 
- const SETTINGS_KEY = 'oca_admin_settings';
+
+const SETTINGS_KEY = 'oca_admin_settings';
 const CALIBRATION_KEY = 'oca_calibration';
 
 const defaultCalibration: CalibrationPoints = {
@@ -10,21 +10,21 @@ const defaultCalibration: CalibrationPoints = {
   left: 116,
   right: 1040,
 };
- 
- const defaultSettings: AdminSettings = {
-   displayMode: 'single',
+
+const defaultSettings: AdminSettings = {
+  displayMode: 'single',
   testStyle: 'default',
-   telegramBotToken: '',
-   telegramChatId: '',
-   redirectUrl: '/',
-   requiredFields: {
-     name: true,
-     phone: true,
-     email: true,
-     city: false,
-     age: true,
-     gender: true,
-   },
+  telegramBotToken: '',
+  telegramChatId: '',
+  redirectUrl: '/',
+  requiredFields: {
+    name: true,
+    phone: true,
+    email: true,
+    city: false,
+    age: true,
+    gender: true,
+  },
   hiddenFields: {
     name: false,
     phone: false,
@@ -33,24 +33,54 @@ const defaultCalibration: CalibrationPoints = {
     age: false,
     gender: false,
   },
-  helpTips: '## Инструкция по прохождению теста\n\n1. Отвечайте на вопросы честно, не задумываясь слишком долго\n2. Выбирайте тот вариант, который первым приходит в голову\n3. Не пропускайте вопросы — на все нужно ответить\n\n## Горячие клавиши (на компьютере)\n- 1/Y — Да\n- 2/M — Может быть\n- 3/N — Нет\n- ← → — навигация\n\nСреднее время прохождения: 25-40 минут',
- };
- 
- export function useAdminSettings() {
-   const [settings, setSettings] = useState<AdminSettings>(() => {
-     const saved = localStorage.getItem(SETTINGS_KEY);
-     if (saved) {
-       try {
-         return { ...defaultSettings, ...JSON.parse(saved) };
-       } catch {
-         return defaultSettings;
-       }
-     }
-     return defaultSettings;
-   });
- 
+  helpTips:
+    '## Инструкция по прохождению теста\n\n1. Отвечайте на вопросы честно, не задумываясь слишком долго\n2. Выбирайте тот вариант, который первым приходит в голову\n3. Не пропускайте вопросы — на все нужно ответить\n\n## Горячие клавиши (на компьютере)\n- 1/Y — Да\n- 2/M — Может быть\n- 3/N — Нет\n- ← → — навигация\n\nСреднее время прохождения: 25-40 минут',
+};
+
+function safeGetItem(key: string) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetJson(key: string, value: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function useAdminSettings() {
+  const [settings, setSettings] = useState<AdminSettings>(() => {
+    const saved = safeGetItem(SETTINGS_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as Partial<AdminSettings>;
+        return {
+          ...defaultSettings,
+          ...parsed,
+          requiredFields: {
+            ...defaultSettings.requiredFields,
+            ...(parsed.requiredFields ?? {}),
+          },
+          hiddenFields: {
+            ...defaultSettings.hiddenFields,
+            ...(parsed.hiddenFields ?? {}),
+          },
+        };
+      } catch {
+        return defaultSettings;
+      }
+    }
+    return defaultSettings;
+  });
+
   const [calibration, setCalibration] = useState<CalibrationPoints>(() => {
-    const saved = localStorage.getItem(CALIBRATION_KEY);
+    const saved = safeGetItem(CALIBRATION_KEY);
     if (saved) {
       try {
         return { ...defaultCalibration, ...JSON.parse(saved) };
@@ -61,19 +91,11 @@ const defaultCalibration: CalibrationPoints = {
     return defaultCalibration;
   });
 
-   useEffect(() => {
-     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-   }, [settings]);
- 
-  useEffect(() => {
-    localStorage.setItem(CALIBRATION_KEY, JSON.stringify(calibration));
-  }, [calibration]);
-
   const updateSettings = useCallback((updates: Partial<AdminSettings>) => {
-    setSettings(prev => {
+    setSettings((prev) => {
       // Deep merge for nested objects like requiredFields and hiddenFields
       const newSettings = { ...prev };
-      
+
       for (const key of Object.keys(updates) as (keyof AdminSettings)[]) {
         const value = updates[key];
         if (key === 'requiredFields' && typeof value === 'object' && value !== null) {
@@ -84,31 +106,51 @@ const defaultCalibration: CalibrationPoints = {
           (newSettings as Record<string, unknown>)[key] = value;
         }
       }
-      
+
+      // Persist immediately (don’t rely on useEffect timing)
+      safeSetJson(SETTINGS_KEY, newSettings);
       return newSettings;
     });
   }, []);
- 
-   const setDisplayMode = useCallback((mode: DisplayMode) => {
-     setSettings(prev => ({ ...prev, displayMode: mode }));
-   }, []);
- 
+
+  const setDisplayMode = useCallback((mode: DisplayMode) => {
+    setSettings((prev) => {
+      const next = { ...prev, displayMode: mode };
+      safeSetJson(SETTINGS_KEY, next);
+      return next;
+    });
+  }, []);
+
   const setTestStyle = useCallback((style: TestStyle) => {
-    setSettings(prev => ({ ...prev, testStyle: style }));
+    setSettings((prev) => {
+      const next = { ...prev, testStyle: style };
+      safeSetJson(SETTINGS_KEY, next);
+      return next;
+    });
   }, []);
 
   const updateCalibration = useCallback((points: CalibrationPoints) => {
-    setCalibration(points);
+    setCalibration(() => {
+      safeSetJson(CALIBRATION_KEY, points);
+      return points;
+    });
   }, []);
 
-   return {
-     settings,
-     updateSettings,
-     setDisplayMode,
+  const saveAll = useCallback(() => {
+    const ok1 = safeSetJson(SETTINGS_KEY, settings);
+    const ok2 = safeSetJson(CALIBRATION_KEY, calibration);
+    return ok1 && ok2;
+  }, [settings, calibration]);
+
+  return {
+    settings,
+    updateSettings,
+    setDisplayMode,
     setTestStyle,
     calibration,
     updateCalibration,
-   };
- }
+    saveAll,
+  };
+}
 
 export { defaultCalibration };
