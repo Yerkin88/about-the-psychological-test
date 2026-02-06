@@ -25,6 +25,7 @@ interface TestResult {
   endTime: string;
   durationMinutes: number;
   createdAt: string;
+  graphImage?: string; // base64 image
 }
 
 Deno.serve(async (req) => {
@@ -94,7 +95,7 @@ Deno.serve(async (req) => {
         .map(s => `${s}: ${result.percentiles[s] > 0 ? '+' : ''}${result.percentiles[s]}`)
         .join(' | ');
 
-      const message = `🆕 *Новый результат теста OCA*
+      const caption = `🆕 *Новый результат теста OCA*
 
 👤 *Клиент:* ${escapeMarkdown(result.clientInfo.name)}
 📱 *Телефон:* ${escapeMarkdown(result.clientInfo.phone)}
@@ -103,31 +104,46 @@ Deno.serve(async (req) => {
 🎂 *Возраст:* ${result.clientInfo.age} лет
 ⚧ *Пол:* ${result.clientInfo.gender === 'male' ? 'Мужской' : 'Женский'}
 
-📊 *Результаты по шкалам:*
+📊 *Результаты:*
 \`${scalesLine}\`
 
-⏱ *Время прохождения:* ${result.durationMinutes} мин
-❓ *Ответов "Возможно":* ${result.maybeCount}
-📅 *Дата:* ${new Date(result.createdAt).toLocaleString('ru-RU')}`;
+⏱ *Время:* ${result.durationMinutes} мин
+❓ *"Возможно":* ${result.maybeCount}`;
 
       try {
-        const telegramUrl = `https://api.telegram.org/bot${settings.telegram_bot_token}/sendMessage`;
-        const telegramResponse = await fetch(telegramUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: settings.telegram_chat_id,
-            text: message,
-            parse_mode: 'Markdown',
-          }),
-        });
+        // If we have graph image, send it as photo
+        if (result.graphImage) {
+          console.log('Sending photo to Telegram...');
+          
+          // Convert base64 to blob
+          const base64Data = result.graphImage.replace(/^data:image\/\w+;base64,/, '');
+          const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+          
+          // Create form data for photo upload
+          const formData = new FormData();
+          formData.append('chat_id', settings.telegram_chat_id);
+          formData.append('caption', caption);
+          formData.append('parse_mode', 'Markdown');
+          formData.append('photo', new Blob([imageBytes], { type: 'image/jpeg' }), 'graph.jpg');
+          
+          const telegramUrl = `https://api.telegram.org/bot${settings.telegram_bot_token}/sendPhoto`;
+          const telegramResponse = await fetch(telegramUrl, {
+            method: 'POST',
+            body: formData,
+          });
 
-        const telegramResult = await telegramResponse.json();
-        
-        if (!telegramResponse.ok) {
-          console.error('Telegram API error:', telegramResult);
+          const telegramResult = await telegramResponse.json();
+          
+          if (!telegramResponse.ok) {
+            console.error('Telegram sendPhoto error:', telegramResult);
+            // Fallback to text message if photo fails
+            await sendTextMessage(settings.telegram_bot_token, settings.telegram_chat_id, caption);
+          } else {
+            console.log('Telegram photo sent successfully');
+          }
         } else {
-          console.log('Telegram notification sent successfully');
+          // No image, send text message only
+          await sendTextMessage(settings.telegram_bot_token, settings.telegram_chat_id, caption);
         }
       } catch (telegramError) {
         console.error('Error sending Telegram notification:', telegramError);
@@ -148,6 +164,28 @@ Deno.serve(async (req) => {
     );
   }
 });
+
+// Helper to send text message to Telegram
+async function sendTextMessage(botToken: string, chatId: string, text: string): Promise<void> {
+  const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+  const telegramResponse = await fetch(telegramUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: text,
+      parse_mode: 'Markdown',
+    }),
+  });
+
+  const telegramResult = await telegramResponse.json();
+  
+  if (!telegramResponse.ok) {
+    console.error('Telegram API error:', telegramResult);
+  } else {
+    console.log('Telegram text message sent successfully');
+  }
+}
 
 // Helper to escape Markdown special characters
 function escapeMarkdown(text: string): string {

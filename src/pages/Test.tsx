@@ -7,11 +7,12 @@ import ListQuestionMode from '@/components/test/ListQuestionMode';
 import DevModeButton from '@/components/test/DevModeButton';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
+import { generateGraphImage } from '@/utils/generateGraphImage';
 
 export default function Test() {
   const navigate = useNavigate();
   const { clientInfo, isComplete, getResult, resetTest } = useTestState();
-  const { settings } = useAdminSettings();
+  const { settings, calibration } = useAdminSettings();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Редирект если нет данных клиента
@@ -31,9 +32,15 @@ export default function Test() {
     setIsSubmitting(true);
 
     try {
+      // Генерируем изображение графика
+      const graphImage = await generateGraphImage(result, calibration);
+
       // Отправляем результат в облако
       const { error } = await supabase.functions.invoke('submit-test', {
-        body: result,
+        body: {
+          ...result,
+          graphImage, // base64 image
+        },
       });
 
       if (error) {
