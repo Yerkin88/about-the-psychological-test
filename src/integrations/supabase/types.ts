@@ -59,6 +59,66 @@ export type Database = {
         }
         Relationships: []
       }
+      test_results: {
+        Row: {
+          answers: Json
+          client_age: number
+          client_city: string
+          client_email: string
+          client_gender: string
+          client_name: string
+          client_phone: string
+          created_at: string
+          duration_minutes: number
+          end_time: string | null
+          id: string
+          maybe_count: number
+          percentiles: Json
+          question_197_answer: string
+          question_22_answer: string
+          raw_scores: Json
+          start_time: string | null
+        }
+        Insert: {
+          answers?: Json
+          client_age: number
+          client_city?: string
+          client_email?: string
+          client_gender: string
+          client_name: string
+          client_phone?: string
+          created_at?: string
+          duration_minutes?: number
+          end_time?: string | null
+          id?: string
+          maybe_count?: number
+          percentiles?: Json
+          question_197_answer?: string
+          question_22_answer?: string
+          raw_scores?: Json
+          start_time?: string | null
+        }
+        Update: {
+          answers?: Json
+          client_age?: number
+          client_city?: string
+          client_email?: string
+          client_gender?: string
+          client_name?: string
+          client_phone?: string
+          created_at?: string
+          duration_minutes?: number
+          end_time?: string | null
+          id?: string
+          maybe_count?: number
+          percentiles?: Json
+          question_197_answer?: string
+          question_22_answer?: string
+          raw_scores?: Json
+          start_time?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
