@@ -150,7 +150,7 @@ import { cn } from '@/lib/utils';
   }, [handleAnswer, nextQuestion, prevQuestion, isMobile]);
  
     return (
-    <div className={styleClasses.container}>
+    <div className={cn(styleClasses.container, "h-[100dvh] overflow-hidden")}>
        {/* Header с прогрессом */}
       <div className={styleClasses.header}>
         <div className="container mx-auto max-w-2xl">
@@ -174,8 +174,8 @@ import { cn } from '@/lib/utils';
          </div>
        </div>
  
-       {/* Основной контент */}
-      <div className="flex-1 flex items-center justify-center p-4 md:p-6">
+        {/* Основной контент */}
+       <div className="flex-1 flex items-center justify-center p-4 md:p-6 overflow-hidden">
         {/* Стрелка влево для Apple стиля */}
         {settings.testStyle === 'apple' && (
           <button
