@@ -44,13 +44,16 @@ import { cn } from '@/lib/utils';
           card: 'w-full max-w-3xl bg-transparent border-0 shadow-none',
           questionNumber: 'text-white/70 font-light text-lg md:text-xl',
           questionText: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white text-center leading-relaxed font-medium px-2',
-          buttonBase: 'min-w-[80px] sm:min-w-[100px] md:min-w-[120px] py-2.5 md:py-3 px-4 md:px-6 rounded-full font-medium text-xs sm:text-sm md:text-base transition-all duration-300 border-2 uppercase tracking-wide shadow-lg',
-          buttonYes: 'border-emerald-400/60 text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-400',
-          buttonYesActive: 'bg-emerald-500 text-white border-emerald-400 shadow-emerald-500/30',
-          buttonMaybe: 'border-amber-400/60 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 hover:border-amber-400',
-          buttonMaybeActive: 'bg-amber-500 text-white border-amber-400 shadow-amber-500/30',
-          buttonNo: 'border-rose-400/60 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 hover:border-rose-400',
-          buttonNoActive: 'bg-rose-500 text-white border-rose-400 shadow-rose-500/30',
+          buttonBase: 'min-w-[92px] sm:min-w-[110px] md:min-w-[130px] py-2.5 md:py-3 px-4 md:px-6 rounded-full font-medium text-xs sm:text-sm md:text-base transition-all duration-300 border-2 shadow-lg',
+
+          // Apple-режим: монохромные кнопки (без цветового кодирования)
+          buttonYes: 'border-white/50 text-white bg-white/5 hover:bg-white/10 hover:border-white/70',
+          buttonYesActive: 'bg-white text-[#1a365d] border-white shadow-black/20',
+          buttonMaybe: 'border-white/50 text-white bg-white/5 hover:bg-white/10 hover:border-white/70',
+          buttonMaybeActive: 'bg-white text-[#1a365d] border-white shadow-black/20',
+          buttonNo: 'border-white/50 text-white bg-white/5 hover:bg-white/10 hover:border-white/70',
+          buttonNoActive: 'bg-white text-[#1a365d] border-white shadow-black/20',
+
           footer: 'bg-transparent border-t border-white/10 p-3 md:p-4',
           progressLabel: 'text-sm uppercase tracking-wider text-white/70',
           navButton: 'text-white/70 hover:text-white',
@@ -236,8 +239,7 @@ import { cn } from '@/lib/utils';
                 )}
               >
                 {styleClasses.showIcons && <Minus className="w-4 h-4 md:w-5 md:h-5 mr-1" />}
-                <span className="hidden sm:inline">Может быть</span>
-                <span className="sm:hidden">Может</span>
+                <span>Может быть</span>
               </button>
 
               {/* Нет */}

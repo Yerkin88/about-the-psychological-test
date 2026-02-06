@@ -94,73 +94,79 @@ Deno.serve(async (req) => {
     if (settings?.telegram_bot_token && settings?.telegram_chat_id) {
       console.log('Sending Telegram notification...');
       
-      // Format message
-      const scales = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-      const scalesLine = scales
-        .map(s => `${s}: ${result.percentiles[s] > 0 ? '+' : ''}${result.percentiles[s]}`)
-        .join(' | ');
+       // Format message (plain text — надёжнее, чем Markdown)
+       const scales = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+       const scalesLine = scales
+         .map((s) => `${s}: ${result.percentiles[s] > 0 ? '+' : ''}${result.percentiles[s]}`)
+         .join(' | ');
 
-      const caption = `🆕 *Новый результат теста OCA*
+       const message =
+         `Новый результат теста OCA\n\n` +
+         `Клиент: ${result.clientInfo.name}\n` +
+         `Телефон: ${result.clientInfo.phone}\n` +
+         `Email: ${result.clientInfo.email}\n` +
+         `Город: ${result.clientInfo.city || '-'}\n` +
+         `Возраст: ${result.clientInfo.age} лет\n` +
+         `Пол: ${result.clientInfo.gender === 'male' ? 'Мужской' : 'Женский'}\n\n` +
+         `Результаты: ${scalesLine}\n\n` +
+         `Время: ${result.durationMinutes} мин\n` +
+         `"Возможно": ${result.maybeCount}`;
 
-👤 *Клиент:* ${escapeMarkdown(result.clientInfo.name)}
-📱 *Телефон:* ${escapeMarkdown(result.clientInfo.phone)}
-📧 *Email:* ${escapeMarkdown(result.clientInfo.email)}
-🏙 *Город:* ${escapeMarkdown(result.clientInfo.city || '-')}
-🎂 *Возраст:* ${result.clientInfo.age} лет
-⚧ *Пол:* ${result.clientInfo.gender === 'male' ? 'Мужской' : 'Женский'}
+       const graphSize = typeof result.graphImage === 'string' ? result.graphImage.length : 0;
+       console.log('Telegram payload:', { hasGraphImage: !!result.graphImage, graphSize });
 
-📊 *Результаты:*
-\`${scalesLine}\`
+       try {
+         // Всегда шлём хотя бы текст
+         let sent: 'text' | 'photo' = 'text';
 
-⏱ *Время:* ${result.durationMinutes} мин
-❓ *"Возможно":* ${result.maybeCount}`;
+         // If we have graph image, try sending as photo first
+         if (result.graphImage) {
+           try {
+             console.log('Sending photo to Telegram...');
 
-      try {
-        // If we have graph image, send it as photo
-        if (result.graphImage) {
-          console.log('Sending photo to Telegram...');
-          
-          // Convert base64 to blob
-          const base64Data = result.graphImage.replace(/^data:image\/\w+;base64,/, '');
-          const imageBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-          
-          // Create form data for photo upload
-          const formData = new FormData();
-          formData.append('chat_id', settings.telegram_chat_id);
-          formData.append('caption', caption);
-          formData.append('parse_mode', 'Markdown');
-          formData.append('photo', new Blob([imageBytes], { type: 'image/jpeg' }), 'graph.jpg');
-          
-          const telegramUrl = `https://api.telegram.org/bot${settings.telegram_bot_token}/sendPhoto`;
-          const telegramResponse = await fetch(telegramUrl, {
-            method: 'POST',
-            body: formData,
-          });
+             // Convert base64 to bytes
+             const base64Data = result.graphImage.replace(/^data:image\/\w+;base64,/, '');
+             const imageBytes = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 
-          const telegramResult = await telegramResponse.json();
-          
-          if (!telegramResponse.ok) {
-            console.error('Telegram sendPhoto error:', telegramResult);
-            // Fallback to text message if photo fails
-            await sendTextMessage(settings.telegram_bot_token, settings.telegram_chat_id, caption);
-          } else {
-            console.log('Telegram photo sent successfully');
-          }
-        } else {
-          // No image, send text message only
-          await sendTextMessage(settings.telegram_bot_token, settings.telegram_chat_id, caption);
-        }
-      } catch (telegramError) {
-        console.error('Error sending Telegram notification:', telegramError);
-      }
+             const formData = new FormData();
+             formData.append('chat_id', settings.telegram_chat_id);
+             formData.append('caption', message);
+             formData.append('photo', new Blob([imageBytes], { type: 'image/jpeg' }), 'graph.jpg');
+
+             const telegramUrl = `https://api.telegram.org/bot${settings.telegram_bot_token}/sendPhoto`;
+             const telegramResponse = await fetch(telegramUrl, {
+               method: 'POST',
+               body: formData,
+             });
+
+             const telegramResult = await telegramResponse.json();
+
+             if (!telegramResponse.ok) {
+               console.error('Telegram sendPhoto error:', telegramResult);
+             } else {
+               sent = 'photo';
+               console.log('Telegram photo sent successfully');
+             }
+           } catch (photoError) {
+             console.error('Telegram photo send failed (will fallback to text):', photoError);
+           }
+         }
+
+         // Если фото не отправилось (или его нет) — отправляем текст
+         if (sent !== 'photo') {
+           await sendTextMessage(settings.telegram_bot_token, settings.telegram_chat_id, message);
+         }
+       } catch (telegramError) {
+         console.error('Error sending Telegram notification:', telegramError);
+       }
     } else {
       console.log('Telegram not configured, skipping notification');
     }
 
-    return new Response(
-      JSON.stringify({ success: true, id: savedResult?.id }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+     return new Response(
+       JSON.stringify({ success: true, id: savedResult?.id, _version: VERSION }),
+       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+     );
   } catch (error) {
     console.error('Error in submit-test:', error);
     return new Response(
@@ -173,15 +179,14 @@ Deno.serve(async (req) => {
 // Helper to send text message to Telegram
 async function sendTextMessage(botToken: string, chatId: string, text: string): Promise<void> {
   const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-  const telegramResponse = await fetch(telegramUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: text,
-      parse_mode: 'Markdown',
-    }),
-  });
+   const telegramResponse = await fetch(telegramUrl, {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({
+       chat_id: chatId,
+       text,
+     }),
+   });
 
   const telegramResult = await telegramResponse.json();
   
@@ -190,10 +195,4 @@ async function sendTextMessage(botToken: string, chatId: string, text: string): 
   } else {
     console.log('Telegram text message sent successfully');
   }
-}
-
-// Helper to escape Markdown special characters
-function escapeMarkdown(text: string): string {
-  if (!text) return '';
-  return text.replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');
 }

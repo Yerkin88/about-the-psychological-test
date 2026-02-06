@@ -15,7 +15,10 @@ export async function generateGraphImage(
   try {
     const baseW = 1156;
     const baseH = 842;
-    const scale = 2;
+
+    // Важно: уменьшаем размер изображения, чтобы отправка результата (base64) не ломалась на мобильных
+    // и не упиралась в лимиты размера запроса.
+    const scale = 1;
 
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(baseW * scale);
@@ -119,8 +122,8 @@ export async function generateGraphImage(
       ctx.fillText(qText, (baseW * scale) / 2, 810 * scale);
     }
 
-    // Convert to base64
-    return canvas.toDataURL('image/jpeg', 0.9);
+    // Convert to base64 (качество ниже, чтобы уменьшить размер payload)
+    return canvas.toDataURL('image/jpeg', 0.75);
   } catch (error) {
     console.error('Error generating graph image:', error);
     return null;
