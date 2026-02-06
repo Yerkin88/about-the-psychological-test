@@ -105,13 +105,13 @@ export default function Register() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                {!hiddenFields.name && (
+                {!hiddenFields.name && requiredFields.name && (
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Имя {requiredFields.name && '*'}</FormLabel>
+                        <FormLabel>Имя *</FormLabel>
                         <FormControl>
                           <Input placeholder="Введите ваше имя" {...field} />
                         </FormControl>
@@ -121,13 +121,13 @@ export default function Register() {
                   />
                 )}
 
-                {!hiddenFields.phone && (
+                {!hiddenFields.phone && requiredFields.phone && (
                   <FormField
                     control={form.control}
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Телефон {requiredFields.phone && '*'}</FormLabel>
+                        <FormLabel>Телефон *</FormLabel>
                         <FormControl>
                           <Input placeholder="+7 (999) 123-45-67" {...field} />
                         </FormControl>
@@ -137,13 +137,13 @@ export default function Register() {
                   />
                 )}
 
-                {!hiddenFields.email && (
+                {!hiddenFields.email && requiredFields.email && (
                   <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email {requiredFields.email && '*'}</FormLabel>
+                        <FormLabel>Email *</FormLabel>
                         <FormControl>
                           <Input type="email" placeholder="example@mail.com" {...field} />
                         </FormControl>
@@ -153,13 +153,13 @@ export default function Register() {
                   />
                 )}
 
-                {!hiddenFields.city && (
+                {!hiddenFields.city && requiredFields.city && (
                   <FormField
                     control={form.control}
                     name="city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Город {requiredFields.city && '*'}</FormLabel>
+                        <FormLabel>Город *</FormLabel>
                         <FormControl>
                           <Input placeholder="Ваш город" {...field} />
                         </FormControl>
@@ -170,13 +170,13 @@ export default function Register() {
                 )}
 
                 <div className="grid grid-cols-2 gap-4">
-                  {!hiddenFields.age && (
+                  {!hiddenFields.age && requiredFields.age && (
                     <FormField
                       control={form.control}
                       name="age"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Возраст {requiredFields.age && '*'}</FormLabel>
+                          <FormLabel>Возраст *</FormLabel>
                           <FormControl>
                             <Input 
                               type="number" 
@@ -191,13 +191,13 @@ export default function Register() {
                     />
                   )}
 
-                  {!hiddenFields.gender && (
+                  {!hiddenFields.gender && requiredFields.gender && (
                     <FormField
                       control={form.control}
                       name="gender"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Пол {requiredFields.gender && '*'}</FormLabel>
+                          <FormLabel>Пол *</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
