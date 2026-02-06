@@ -1,8 +1,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+// Version for debugging deployments
+const VERSION = "v1.1.0";
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 interface TestResult {
@@ -29,6 +32,8 @@ interface TestResult {
 }
 
 Deno.serve(async (req) => {
+  console.log(`[${VERSION}] Request received: ${req.method}`);
+  
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -36,7 +41,7 @@ Deno.serve(async (req) => {
 
   try {
     const result: TestResult = await req.json();
-    console.log('Received test result for:', result.clientInfo.name);
+    console.log(`[${VERSION}] Received test result for:`, result.clientInfo.name);
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
