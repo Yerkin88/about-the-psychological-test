@@ -69,9 +69,25 @@ const defaultCalibration: CalibrationPoints = {
     localStorage.setItem(CALIBRATION_KEY, JSON.stringify(calibration));
   }, [calibration]);
 
-   const updateSettings = useCallback((updates: Partial<AdminSettings>) => {
-     setSettings(prev => ({ ...prev, ...updates }));
-   }, []);
+  const updateSettings = useCallback((updates: Partial<AdminSettings>) => {
+    setSettings(prev => {
+      // Deep merge for nested objects like requiredFields and hiddenFields
+      const newSettings = { ...prev };
+      
+      for (const key of Object.keys(updates) as (keyof AdminSettings)[]) {
+        const value = updates[key];
+        if (key === 'requiredFields' && typeof value === 'object' && value !== null) {
+          newSettings.requiredFields = { ...prev.requiredFields, ...value };
+        } else if (key === 'hiddenFields' && typeof value === 'object' && value !== null) {
+          newSettings.hiddenFields = { ...prev.hiddenFields, ...value };
+        } else if (value !== undefined) {
+          (newSettings as Record<string, unknown>)[key] = value;
+        }
+      }
+      
+      return newSettings;
+    });
+  }, []);
  
    const setDisplayMode = useCallback((mode: DisplayMode) => {
      setSettings(prev => ({ ...prev, displayMode: mode }));
