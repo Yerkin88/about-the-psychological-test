@@ -14,20 +14,39 @@ import { DisplayMode, TestStyle } from '@/types/oca';
 import GraphCalibration from './GraphCalibration';
  
 export default function AdminSettings() {
-  const { settings, updateSettings, setDisplayMode, setTestStyle, calibration, updateCalibration, saveAll } = useAdminSettings();
+  const { settings, updateSettings, setDisplayMode, setTestStyle, calibration, updateCalibration, saveAll, isLoading } = useAdminSettings();
   const [showCalibration, setShowCalibration] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    const ok = saveAll();
-    ok ? toast.success('Настройки сохранены') : toast.error('Не удалось сохранить настройки');
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const ok = await saveAll();
+      ok ? toast.success('Настройки сохранены') : toast.error('Не удалось сохранить настройки');
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="ml-3 text-muted-foreground">Загрузка настроек...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <Button onClick={handleSave} className="gap-2">
-          <Save className="w-4 h-4" />
-          Сохранить настройки
+        <Button onClick={handleSave} disabled={isSaving} className="gap-2">
+          {isSaving ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
+          {isSaving ? 'Сохранение...' : 'Сохранить настройки'}
         </Button>
       </div>
        {/* Режим отображения вопросов */}

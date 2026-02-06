@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_settings: {
+        Row: {
+          calibration: Json
+          created_at: string
+          display_mode: string
+          help_tips: string
+          hidden_fields: Json
+          id: string
+          redirect_url: string
+          required_fields: Json
+          telegram_bot_token: string
+          telegram_chat_id: string
+          test_style: string
+          updated_at: string
+        }
+        Insert: {
+          calibration?: Json
+          created_at?: string
+          display_mode?: string
+          help_tips?: string
+          hidden_fields?: Json
+          id?: string
+          redirect_url?: string
+          required_fields?: Json
+          telegram_bot_token?: string
+          telegram_chat_id?: string
+          test_style?: string
+          updated_at?: string
+        }
+        Update: {
+          calibration?: Json
+          created_at?: string
+          display_mode?: string
+          help_tips?: string
+          hidden_fields?: Json
+          id?: string
+          redirect_url?: string
+          required_fields?: Json
+          telegram_bot_token?: string
+          telegram_chat_id?: string
+          test_style?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
