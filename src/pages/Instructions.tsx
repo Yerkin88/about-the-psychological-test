@@ -1,13 +1,10 @@
- import { useNavigate } from 'react-router-dom';
- import { Button } from '@/components/ui/button';
- import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Circle, XCircle, ArrowRight, ArrowLeft } from 'lucide-react';
- 
- export default function Instructions() {
-   const navigate = useNavigate();
- 
-   return (
-     <div className="min-h-screen bg-background py-8 md:py-16">
+export default function Instructions() {
+  const navigate = useNavigate();
+  return <div className="min-h-screen bg-background py-8 md:py-16">
        <div className="container mx-auto px-4 max-w-3xl">
          <Card className="shadow-lg">
            <CardHeader className="text-center pb-2">
@@ -85,7 +82,7 @@ import { CheckCircle, Circle, XCircle, ArrowRight, ArrowLeft } from 'lucide-reac
                  <div className="flex items-center gap-3 p-4 bg-warning/10 rounded-lg">
                    <Circle className="w-8 h-8 text-warning" />
                    <div>
-                     <p className="font-semibold text-foreground">ВОЗМОЖНО</p>
+                     <p className="font-semibold text-foreground">МОЖЕТ БЫТЬ</p>
                      <p className="text-sm text-muted-foreground">может быть или неуверен</p>
                    </div>
                  </div>
@@ -103,19 +100,10 @@ import { CheckCircle, Circle, XCircle, ArrowRight, ArrowLeft } from 'lucide-reac
              {/* Кнопка продолжения */}
              <div className="pt-4">
               <div className="flex gap-3">
-                <Button 
-                  variant="outline"
-                  size="lg" 
-                  className="py-6"
-                  onClick={() => navigate('/register')}
-                >
+                <Button variant="outline" size="lg" className="py-6" onClick={() => navigate('/register')}>
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
-               <Button 
-                 size="lg" 
-                className="flex-1 text-lg py-6"
-                onClick={() => navigate('/test')}
-               >
+               <Button size="lg" className="flex-1 text-lg py-6" onClick={() => navigate('/test')}>
                 Начать тест
                  <ArrowRight className="ml-2 w-5 h-5" />
                </Button>
@@ -124,6 +112,5 @@ import { CheckCircle, Circle, XCircle, ArrowRight, ArrowLeft } from 'lucide-reac
            </CardContent>
          </Card>
        </div>
-     </div>
-   );
- }
+     </div>;
+}
