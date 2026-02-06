@@ -42,15 +42,15 @@ import { cn } from '@/lib/utils';
           container: 'min-h-screen flex flex-col bg-gradient-to-b from-[#1a365d] via-[#234e7a] to-[#1a365d]',
           header: 'bg-transparent border-b border-white/10 p-3 md:p-4',
           card: 'w-full max-w-3xl bg-transparent border-0 shadow-none',
-          questionNumber: 'text-white/80 font-medium',
-          questionText: 'text-2xl md:text-3xl lg:text-4xl text-white text-center leading-relaxed font-medium',
-          buttonBase: 'min-w-[70px] md:min-w-[100px] py-1.5 md:py-2 px-2 md:px-4 rounded-full font-normal text-[10px] md:text-xs transition-all duration-300 border uppercase tracking-wide',
-          buttonYes: 'border-white/40 text-white/70 bg-transparent hover:bg-white/10 hover:border-white/60',
-          buttonYesActive: 'bg-white text-[#1a365d] border-white shadow-lg',
-          buttonMaybe: 'border-white/40 text-white/70 bg-transparent hover:bg-white/10 hover:border-white/60',
-          buttonMaybeActive: 'bg-white text-[#1a365d] border-white shadow-lg',
-          buttonNo: 'border-white/40 text-white/70 bg-transparent hover:bg-white/10 hover:border-white/60',
-          buttonNoActive: 'bg-white text-[#1a365d] border-white shadow-lg',
+          questionNumber: 'text-white/70 font-light text-lg md:text-xl',
+          questionText: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white text-center leading-relaxed font-medium px-2',
+          buttonBase: 'min-w-[80px] sm:min-w-[100px] md:min-w-[120px] py-2.5 md:py-3 px-4 md:px-6 rounded-full font-medium text-xs sm:text-sm md:text-base transition-all duration-300 border-2 uppercase tracking-wide shadow-lg',
+          buttonYes: 'border-emerald-400/60 text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-400',
+          buttonYesActive: 'bg-emerald-500 text-white border-emerald-400 shadow-emerald-500/30',
+          buttonMaybe: 'border-amber-400/60 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 hover:border-amber-400',
+          buttonMaybeActive: 'bg-amber-500 text-white border-amber-400 shadow-amber-500/30',
+          buttonNo: 'border-rose-400/60 text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 hover:border-rose-400',
+          buttonNoActive: 'bg-rose-500 text-white border-rose-400 shadow-rose-500/30',
           footer: 'bg-transparent border-t border-white/10 p-3 md:p-4',
           progressLabel: 'text-sm uppercase tracking-wider text-white/70',
           navButton: 'text-white/70 hover:text-white',
@@ -61,15 +61,15 @@ import { cn } from '@/lib/utils';
           container: 'min-h-screen flex flex-col bg-background',
           header: 'bg-card border-b p-3 md:p-4',
           card: 'w-full max-w-2xl shadow-none border-0 md:border md:shadow-sm',
-          questionNumber: 'text-primary font-medium',
-          questionText: 'text-2xl md:text-3xl lg:text-4xl text-foreground text-center leading-relaxed font-medium',
-          buttonBase: 'flex-1 min-w-0 py-1.5 md:py-2 px-1.5 md:px-3 rounded-lg font-normal text-[10px] md:text-xs transition-all duration-200 border',
-          buttonYes: 'border-border/50 text-muted-foreground/70 hover:border-success hover:bg-success/10',
-          buttonYesActive: 'bg-success text-white border-success',
-          buttonMaybe: 'border-border/50 text-muted-foreground/70 hover:border-warning hover:bg-warning/10',
-          buttonMaybeActive: 'bg-warning text-white border-warning',
-          buttonNo: 'border-border/50 text-muted-foreground/70 hover:border-destructive hover:bg-destructive/10',
-          buttonNoActive: 'bg-destructive text-white border-destructive',
+          questionNumber: 'text-primary font-medium text-lg md:text-xl',
+          questionText: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl text-foreground text-center leading-relaxed font-medium px-2',
+          buttonBase: 'flex-1 min-w-[80px] sm:min-w-[90px] py-2.5 md:py-3 px-3 md:px-5 rounded-xl font-medium text-xs sm:text-sm md:text-base transition-all duration-200 border-2',
+          buttonYes: 'border-success/30 text-success bg-success/5 hover:border-success hover:bg-success/10',
+          buttonYesActive: 'bg-success text-white border-success shadow-lg',
+          buttonMaybe: 'border-warning/30 text-warning bg-warning/5 hover:border-warning hover:bg-warning/10',
+          buttonMaybeActive: 'bg-warning text-white border-warning shadow-lg',
+          buttonNo: 'border-destructive/30 text-destructive bg-destructive/5 hover:border-destructive hover:bg-destructive/10',
+          buttonNoActive: 'bg-destructive text-white border-destructive shadow-lg',
           footer: 'bg-card border-t p-3 md:p-4',
           progressLabel: 'text-sm text-muted-foreground',
           navButton: '',
@@ -79,16 +79,16 @@ import { cn } from '@/lib/utils';
         return {
           container: 'min-h-screen flex flex-col bg-background',
           header: 'bg-card border-b p-3 md:p-4',
-          card: 'w-full max-w-2xl shadow-lg border-0 md:border',
-          questionNumber: 'text-primary font-semibold',
-          questionText: 'text-2xl md:text-3xl lg:text-4xl text-foreground text-center leading-relaxed font-semibold',
-          buttonBase: 'flex-1 min-w-0 py-1.5 md:py-2 px-1.5 md:px-3 rounded-xl font-normal text-[10px] md:text-xs transition-all duration-200',
-          buttonYes: 'bg-success/5 text-success/60 hover:bg-success/15 border border-success/20',
-          buttonYesActive: 'bg-success text-white shadow-lg ring-2 ring-success/50',
-          buttonMaybe: 'bg-warning/5 text-warning/60 hover:bg-warning/15 border border-warning/20',
-          buttonMaybeActive: 'bg-warning text-white shadow-lg ring-2 ring-warning/50',
-          buttonNo: 'bg-destructive/5 text-destructive/60 hover:bg-destructive/15 border border-destructive/20',
-          buttonNoActive: 'bg-destructive text-white shadow-lg ring-2 ring-destructive/50',
+          card: 'w-full max-w-2xl shadow-xl border-0 md:border rounded-2xl',
+          questionNumber: 'text-primary font-bold text-lg md:text-xl',
+          questionText: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl text-foreground text-center leading-relaxed font-semibold px-2',
+          buttonBase: 'flex-1 min-w-[80px] sm:min-w-[90px] py-2.5 md:py-3 px-3 md:px-5 rounded-xl font-semibold text-xs sm:text-sm md:text-base transition-all duration-200 border-2 shadow-md',
+          buttonYes: 'bg-success/10 text-success border-success/30 hover:bg-success/20 hover:border-success/50',
+          buttonYesActive: 'bg-success text-white shadow-lg shadow-success/30 ring-2 ring-success/50 border-success',
+          buttonMaybe: 'bg-warning/10 text-warning border-warning/30 hover:bg-warning/20 hover:border-warning/50',
+          buttonMaybeActive: 'bg-warning text-white shadow-lg shadow-warning/30 ring-2 ring-warning/50 border-warning',
+          buttonNo: 'bg-destructive/10 text-destructive border-destructive/30 hover:bg-destructive/20 hover:border-destructive/50',
+          buttonNoActive: 'bg-destructive text-white shadow-lg shadow-destructive/30 ring-2 ring-destructive/50 border-destructive',
           footer: 'bg-card border-t p-3 md:p-4',
           progressLabel: 'text-sm text-muted-foreground',
           navButton: '',
@@ -191,19 +191,21 @@ import { cn } from '@/lib/utils';
         )}
 
         <Card className={styleClasses.card}>
-          <CardContent className="p-4 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[320px]">
+          <CardContent className="p-5 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[380px]">
             {/* Номер и текст вопроса */}
-            <div className="text-center flex-1 flex items-center justify-center">
+            <div className="text-center flex-1 flex flex-col items-center justify-center gap-4">
+              <span className={styleClasses.questionNumber}>
+                Вопрос {currentQuestionIndex + 1} из {totalQuestions}
+              </span>
               <p className={styleClasses.questionText}>
-                <span className={styleClasses.questionNumber}>{currentQuestionIndex + 1}. </span>
                 {currentQuestion.text}
               </p>
             </div>
  
              {/* Кнопки ответов */}
             <div className={cn(
-              "flex justify-center mt-6 md:mt-8",
-              settings.testStyle === 'apple' ? "gap-3 md:gap-4" : "gap-2 md:gap-3 w-full"
+              "flex justify-center mt-8 md:mt-10",
+              settings.testStyle === 'apple' ? "gap-3 md:gap-5" : "gap-3 md:gap-4 w-full max-w-lg mx-auto"
             )}>
               {/* Да */}
               <button
@@ -234,7 +236,8 @@ import { cn } from '@/lib/utils';
                 )}
               >
                 {styleClasses.showIcons && <Minus className="w-4 h-4 md:w-5 md:h-5 mr-1" />}
-                <span>Может быть</span>
+                <span className="hidden sm:inline">Может быть</span>
+                <span className="sm:hidden">Может</span>
               </button>
 
               {/* Нет */}

@@ -1,1 +1,10 @@
 project_id = "vepssaonhrjjoqzueswe"
+
+[functions.submit-test]
+verify_jwt = false
+
+[functions.test-telegram]
+verify_jwt = false
+
+[functions.update-admin-settings]
+verify_jwt = false
