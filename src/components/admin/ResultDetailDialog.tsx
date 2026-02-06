@@ -18,21 +18,28 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
    onClose: () => void;
  }
  
- export default function ResultDetailDialog({ result, onClose }: Props) {
-   const graphRef = useRef<HTMLDivElement>(null);
+export default function ResultDetailDialog({ result, onClose }: Props) {
+  const graphRef = useRef<HTMLDivElement>(null);
   const { calibration } = useAdminSettings();
 
   const safeAnswers = result?.answers ?? [];
- 
-   const formatDate = (date: Date | string) => {
-     return new Date(date).toLocaleDateString('ru-RU', {
-       day: '2-digit',
-       month: '2-digit',
-       year: 'numeric',
-     });
-   };
- 
-  const answerLabel = (answer?: AnswerType) => {
+
+  // All hooks must be called before any conditional return
+  const answersByQuestionId = useMemo(() => {
+    const map = new Map<number, AnswerType>();
+    safeAnswers.forEach((a) => map.set(a.questionId, a.answer));
+    return map;
+  }, [safeAnswers]);
+
+  const formatDate = useCallback((date: Date | string) => {
+    return new Date(date).toLocaleDateString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  }, []);
+
+  const answerLabel = useCallback((answer?: AnswerType) => {
     switch (answer) {
       case 'yes':
         return '+';
@@ -43,13 +50,7 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
       default:
         return '';
     }
-  };
-
-  const answersByQuestionId = useMemo(() => {
-    const map = new Map<number, AnswerType>();
-    safeAnswers.forEach((a) => map.set(a.questionId, a.answer));
-    return map;
-  }, [safeAnswers]);
+  }, []);
 
   const buildCopyText = useCallback(() => {
     return questions
@@ -58,7 +59,7 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
         return `Q${q.id}: ${symbol}`;
       })
       .join('\n');
-  }, [answersByQuestionId]);
+  }, [answersByQuestionId, answerLabel]);
 
   const handleCopyAll = useCallback(async () => {
     const text = buildCopyText();
@@ -66,7 +67,6 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
       await navigator.clipboard.writeText(text);
       toast.success('Скопировано в буфер обмена');
     } catch {
-      // fallback
       const textarea = document.createElement('textarea');
       textarea.value = text;
       textarea.style.position = 'fixed';
@@ -80,10 +80,9 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
   }, [buildCopyText]);
 
   const handleDownloadJpg = useCallback(async (cal: CalibrationPoints) => {
-    try {
-      if (!result) return;
+    if (!result) return;
 
-      // Размеры шаблона
+    try {
       const baseW = 1156;
       const baseH = 842;
       const scale = 2;
@@ -94,7 +93,6 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('no_canvas');
 
-      // Сначала загружаем фоновое изображение шаблона
       const bgImg = new Image();
       await new Promise<void>((resolve, reject) => {
         bgImg.onload = () => resolve();
@@ -102,14 +100,10 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
         bgImg.src = ocaTemplate;
       });
 
-      // Рисуем белый фон
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Рисуем фоновое изображение (шаблон)
       ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
-      // Настройки графика с калибровкой
       const graph = {
         left: cal.left * scale,
         right: cal.right * scale,
@@ -126,7 +120,6 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
         return graph.top + normalized * graphHeight;
       };
 
-      // Рисуем линию графика
       ctx.beginPath();
       ctx.strokeStyle = '#000000';
       ctx.lineWidth = 3 * scale;
@@ -144,7 +137,6 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
       });
       ctx.stroke();
 
-      // Рисуем точки
       scales.forEach((s, i) => {
         const x = graph.left + i * xStep;
         const y = yScale(result.percentiles[s]);
@@ -154,25 +146,21 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
         ctx.fill();
       });
 
-      // Заголовок "Результаты теста OCA"
       ctx.font = `bold ${24 * scale}px Arial, sans-serif`;
       ctx.fillStyle = '#000000';
       ctx.textAlign = 'center';
       ctx.fillText('Результаты теста', (baseW * scale) / 2, 40 * scale);
 
-      // Информация о клиенте
       ctx.font = `${18 * scale}px Arial, sans-serif`;
       const infoText = `${result.clientInfo.name}   |   ${result.clientInfo.age} лет   |   ${formatDate(result.createdAt)}`;
       ctx.fillText(infoText, (baseW * scale) / 2, 75 * scale);
 
-      // Значения шкал A-J
       ctx.font = `bold ${16 * scale}px Arial, sans-serif`;
       const valuesLine = scales
         .map((s) => `${s}:${result.percentiles[s] > 0 ? '+' : ''}${result.percentiles[s]}`)
         .join('   ');
       ctx.fillText(valuesLine, (baseW * scale) / 2, 780 * scale);
 
-      // Q22/Q197 — только если положительные
       const showQ22 = result.question22Answer === 'yes';
       const showQ197 = result.question197Answer === 'yes';
       if (showQ22 || showQ197) {
@@ -210,11 +198,12 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
     } catch {
       toast.error('Ошибка при скачивании');
     }
-  }, [result]);
+  }, [result, formatDate]);
 
+  // Early return AFTER all hooks
   if (!result) return null;
- 
-   const scales: ScaleKey[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+
+  const scales: ScaleKey[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
  
    return (
      <Dialog open={!!result} onOpenChange={() => onClose()}>
