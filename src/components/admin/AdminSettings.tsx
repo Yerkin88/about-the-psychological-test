@@ -21,15 +21,23 @@ export default function AdminSettings() {
   const [isTesting, setIsTesting] = useState(false);
 
   const handleTestTelegram = async () => {
+    // Проверяем, заполнены ли поля
+    if (!settings.telegramBotToken || !settings.telegramChatId) {
+      toast.error('Заполните Bot Token и Chat ID');
+      return;
+    }
+
     setIsTesting(true);
     try {
-      // Сначала сохраняем настройки, чтобы использовать актуальные данные
+      // Сначала сохраняем настройки
+      toast.info('Сохранение настроек...');
       const saved = await saveAll();
       if (!saved) {
-        toast.error('Сначала сохраните настройки');
+        toast.error('Не удалось сохранить настройки');
         return;
       }
-
+      
+      toast.info('Отправка тестового сообщения...');
       const { data, error } = await supabase.functions.invoke('test-telegram');
       
       if (error) {
