@@ -8,15 +8,48 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
-import { Crosshair, Save } from 'lucide-react';
+import { Crosshair, Save, Send } from 'lucide-react';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { DisplayMode, TestStyle } from '@/types/oca';
 import GraphCalibration from './GraphCalibration';
+import { supabase } from '@/integrations/supabase/client';
  
 export default function AdminSettings() {
   const { settings, updateSettings, setDisplayMode, setTestStyle, calibration, updateCalibration, saveAll, isLoading } = useAdminSettings();
   const [showCalibration, setShowCalibration] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+
+  const handleTestTelegram = async () => {
+    setIsTesting(true);
+    try {
+      // Сначала сохраняем настройки, чтобы использовать актуальные данные
+      const saved = await saveAll();
+      if (!saved) {
+        toast.error('Сначала сохраните настройки');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('test-telegram');
+      
+      if (error) {
+        console.error('Error calling test-telegram:', error);
+        toast.error('Ошибка вызова функции: ' + error.message);
+        return;
+      }
+
+      if (data?.success) {
+        toast.success(data.message || 'Тестовое сообщение отправлено!');
+      } else {
+        toast.error(data?.error || 'Не удалось отправить сообщение');
+      }
+    } catch (err) {
+      console.error('Test telegram error:', err);
+      toast.error('Ошибка при тестировании');
+    } finally {
+      setIsTesting(false);
+    }
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -173,6 +206,19 @@ export default function AdminSettings() {
                onChange={(e) => updateSettings({ telegramChatId: e.target.value })}
              />
            </div>
+           <Button 
+             onClick={handleTestTelegram} 
+             disabled={isTesting || !settings.telegramBotToken || !settings.telegramChatId}
+             variant="outline"
+             className="w-full gap-2"
+           >
+             {isTesting ? (
+               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+             ) : (
+               <Send className="w-4 h-4" />
+             )}
+             {isTesting ? 'Отправка...' : 'Отправить тестовое уведомление'}
+           </Button>
          </CardContent>
        </Card>
  
