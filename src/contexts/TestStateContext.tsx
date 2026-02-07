@@ -30,6 +30,7 @@ interface TestStateContextValue {
   isComplete: boolean;
   setClientInfo: (info: ClientInfo) => void;
   setAnswer: (questionId: number, answer: AnswerType) => void;
+  answerCurrentAndAdvance: (answer: AnswerType) => void;
   getAnswer: (questionId: number) => AnswerType | undefined;
   goToQuestion: (index: number) => void;
   nextQuestion: () => void;
@@ -90,6 +91,24 @@ export function TestStateProvider({ children }: { children: ReactNode }) {
         newAnswers.push({ questionId, answer });
       }
       return { ...prev, answers: newAnswers };
+    });
+  }, []);
+
+  // Atomic: set answer for current question AND advance to next — prevents stale closure bugs
+  const answerCurrentAndAdvance = useCallback((answer: AnswerType) => {
+    setState(prev => {
+      const questionId = questions[prev.currentQuestionIndex].id;
+      const existingIndex = prev.answers.findIndex(a => a.questionId === questionId);
+      const newAnswers = [...prev.answers];
+      if (existingIndex >= 0) {
+        newAnswers[existingIndex] = { questionId, answer };
+      } else {
+        newAnswers.push({ questionId, answer });
+      }
+      const newIndex = prev.currentQuestionIndex < questions.length - 1
+        ? prev.currentQuestionIndex + 1
+        : prev.currentQuestionIndex;
+      return { ...prev, answers: newAnswers, currentQuestionIndex: newIndex };
     });
   }, []);
 
@@ -222,6 +241,7 @@ export function TestStateProvider({ children }: { children: ReactNode }) {
         isComplete,
         setClientInfo,
         setAnswer,
+        answerCurrentAndAdvance,
         getAnswer,
         goToQuestion,
         nextQuestion,
