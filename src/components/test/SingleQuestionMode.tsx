@@ -16,22 +16,23 @@ import { cn } from '@/lib/utils';
  }
  
  export default function SingleQuestionMode({ onComplete }: Props) {
-   const {
-     currentQuestion,
-     currentQuestionIndex,
-     totalQuestions,
-     answeredCount,
-     isComplete,
-     setAnswer,
-     getAnswer,
-     nextQuestion,
-     prevQuestion,
-   } = useTestState();
+    const {
+      currentQuestion,
+      currentQuestionIndex,
+      totalQuestions,
+      answeredCount,
+      isComplete,
+      setAnswer,
+      answerCurrentAndAdvance,
+      getAnswer,
+      nextQuestion,
+      prevQuestion,
+    } = useTestState();
 
-  const { settings } = useAdminSettings();
-  const isMobile = useIsMobile();
- 
-   const currentAnswer = getAnswer(currentQuestion.id);
+    const { settings } = useAdminSettings();
+    const isMobile = useIsMobile();
+
+    const currentAnswer = getAnswer(currentQuestion.id);
    const progress = (answeredCount / totalQuestions) * 100;
 
   // Стили для разных тем
@@ -100,13 +101,10 @@ import { cn } from '@/lib/utils';
     }
   }, [settings.testStyle]);
  
-   const handleAnswer = useCallback((answer: AnswerType) => {
-     setAnswer(currentQuestion.id, answer);
-     // Автоматический переход к следующему вопросу
-     if (currentQuestionIndex < totalQuestions - 1) {
-       setTimeout(() => nextQuestion(), 150);
-     }
-   }, [currentQuestion.id, currentQuestionIndex, totalQuestions, setAnswer, nextQuestion]);
+    const handleAnswer = useCallback((answer: AnswerType) => {
+      // Use atomic answerCurrentAndAdvance to prevent stale closure race conditions
+      answerCurrentAndAdvance(answer);
+    }, [answerCurrentAndAdvance]);
  
    // Горячие клавиши
    useEffect(() => {
