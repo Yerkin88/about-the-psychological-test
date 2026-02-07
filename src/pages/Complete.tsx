@@ -9,21 +9,27 @@
    const { settings } = useAdminSettings();
    const [countdown, setCountdown] = useState(5);
  
-   useEffect(() => {
-     const timer = setInterval(() => {
-       setCountdown(prev => {
-         if (prev <= 1) {
-           clearInterval(timer);
-           const redirectUrl = settings.redirectUrl || '/';
-           navigate(redirectUrl);
-           return 0;
-         }
-         return prev - 1;
-       });
-     }, 1000);
- 
-     return () => clearInterval(timer);
-   }, [navigate, settings.redirectUrl]);
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            const redirectUrl = settings.redirectUrl || '/';
+            // If it's an external URL (contains dots and no leading slash), use window.location
+            if (redirectUrl.includes('.') && !redirectUrl.startsWith('/')) {
+              const url = redirectUrl.startsWith('http') ? redirectUrl : `https://${redirectUrl}`;
+              window.location.href = url;
+            } else {
+              navigate(redirectUrl);
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+  
+      return () => clearInterval(timer);
+    }, [navigate, settings.redirectUrl]);
  
    return (
      <div className="min-h-screen bg-background flex items-center justify-center p-4">

@@ -40,24 +40,23 @@ import { cn } from '@/lib/utils';
     switch (settings.testStyle) {
       case 'apple':
         return {
-          container: 'min-h-screen flex flex-col bg-gradient-to-b from-[#1a365d] via-[#234e7a] to-[#1a365d]',
-          header: 'bg-transparent border-b border-white/10 p-3 md:p-4',
+          container: 'min-h-screen flex flex-col bg-gradient-to-b from-[#1a365d] via-[#234e7a] to-[#1a365d] dark:from-[#1a365d] dark:via-[#234e7a] dark:to-[#1a365d] from-[#e8eef5] via-[#dce5f0] to-[#e8eef5]',
+          header: 'bg-transparent border-b border-black/10 dark:border-white/10 p-3 md:p-4',
           card: 'w-full max-w-3xl bg-transparent border-0 shadow-none',
-          questionNumber: 'text-white/70 font-light text-lg md:text-xl',
-          questionText: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white text-center leading-relaxed font-medium px-2',
-          buttonBase: 'min-w-[92px] sm:min-w-[110px] md:min-w-[130px] py-2.5 md:py-3 px-4 md:px-6 rounded-full font-medium text-xs sm:text-sm md:text-base transition-all duration-300 border-2 shadow-lg',
+          questionNumber: 'text-foreground/70 dark:text-white/70 font-light text-lg md:text-xl',
+          questionText: 'text-xl sm:text-2xl md:text-3xl lg:text-4xl text-foreground dark:text-white text-center leading-relaxed font-medium px-2',
+          buttonBase: 'min-w-[92px] sm:min-w-[110px] md:min-w-[130px] h-[44px] md:h-[48px] rounded-full font-medium text-xs sm:text-sm md:text-base transition-all duration-300 border-2 shadow-lg whitespace-nowrap',
 
-          // Apple-режим: монохромные кнопки (без цветового кодирования)
-          buttonYes: 'border-white/50 text-white bg-white/5 hover:bg-white/10 hover:border-white/70',
-          buttonYesActive: 'bg-white text-[#1a365d] border-white shadow-black/20',
-          buttonMaybe: 'border-white/50 text-white bg-white/5 hover:bg-white/10 hover:border-white/70',
-          buttonMaybeActive: 'bg-white text-[#1a365d] border-white shadow-black/20',
-          buttonNo: 'border-white/50 text-white bg-white/5 hover:bg-white/10 hover:border-white/70',
-          buttonNoActive: 'bg-white text-[#1a365d] border-white shadow-black/20',
+          buttonYes: 'border-foreground/20 dark:border-white/50 text-foreground dark:text-white bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 hover:border-foreground/40 dark:hover:border-white/70',
+          buttonYesActive: 'bg-foreground dark:bg-white text-background dark:text-[#1a365d] border-foreground dark:border-white shadow-black/20',
+          buttonMaybe: 'border-foreground/20 dark:border-white/50 text-foreground dark:text-white bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 hover:border-foreground/40 dark:hover:border-white/70',
+          buttonMaybeActive: 'bg-foreground dark:bg-white text-background dark:text-[#1a365d] border-foreground dark:border-white shadow-black/20',
+          buttonNo: 'border-foreground/20 dark:border-white/50 text-foreground dark:text-white bg-foreground/5 dark:bg-white/5 hover:bg-foreground/10 dark:hover:bg-white/10 hover:border-foreground/40 dark:hover:border-white/70',
+          buttonNoActive: 'bg-foreground dark:bg-white text-background dark:text-[#1a365d] border-foreground dark:border-white shadow-black/20',
 
-          footer: 'bg-transparent border-t border-white/10 p-3 md:p-4',
-          progressLabel: 'text-sm uppercase tracking-wider text-white/70',
-          navButton: 'text-white/70 hover:text-white',
+          footer: 'bg-transparent border-t border-black/10 dark:border-white/10 p-3 md:p-4',
+          progressLabel: 'text-sm uppercase tracking-wider text-foreground/70 dark:text-white/70',
+          navButton: 'text-foreground/70 dark:text-white/70 hover:text-foreground dark:hover:text-white',
           showIcons: false,
         };
       case 'minimal':
@@ -101,6 +100,9 @@ import { cn } from '@/lib/utils';
     }
   }, [settings.testStyle]);
  
+    const isApple = settings.testStyle === 'apple';
+
+
     const handleAnswer = useCallback((answer: AnswerType) => {
       // Use atomic answerCurrentAndAdvance to prevent stale closure race conditions
       answerCurrentAndAdvance(answer);
@@ -157,21 +159,23 @@ import { cn } from '@/lib/utils';
         <div className="container mx-auto max-w-2xl">
           {/* Верхняя панель с темой и помощью */}
           <div className="flex items-center justify-end gap-1 mb-3">
-            <HelpTipsDialog className={settings.testStyle === 'apple' ? 'text-white/70 hover:text-white' : ''} />
-            <ThemeToggle className={settings.testStyle === 'apple' ? 'text-white/70 hover:text-white' : ''} />
+            <HelpTipsDialog className={isApple ? 'text-foreground/70 dark:text-white/70 hover:text-foreground dark:hover:text-white' : ''} />
+            <ThemeToggle className={isApple ? 'text-foreground/70 dark:text-white/70 hover:text-foreground dark:hover:text-white' : ''} />
           </div>
 
           {settings.testStyle !== 'apple' && (
-            <div className="flex items-center justify-between mb-2">
-              <span className={styleClasses.progressLabel}>
-                Вопрос {currentQuestionIndex + 1} из {totalQuestions}
-              </span>
-              <span className={styleClasses.progressLabel}>
-                Отвечено: {answeredCount}
-              </span>
-            </div>
+            <>
+              <div className="flex items-center justify-between mb-2">
+                <span className={styleClasses.progressLabel}>
+                  Вопрос {currentQuestionIndex + 1} из {totalQuestions}
+                </span>
+                <span className={styleClasses.progressLabel}>
+                  Отвечено: {answeredCount}
+                </span>
+              </div>
+              <Progress value={progress} className="h-2" />
+            </>
           )}
-          {settings.testStyle !== 'apple' && <Progress value={progress} className="h-2" />}
          </div>
        </div>
  
@@ -192,23 +196,25 @@ import { cn } from '@/lib/utils';
         )}
 
         <Card className={styleClasses.card}>
-          <CardContent className="p-5 md:p-10 flex flex-col justify-between min-h-[320px] md:min-h-[380px]">
-            {/* Номер и текст вопроса */}
-            <div className="text-center flex-1 flex flex-col items-center justify-center gap-4">
-              <span className={styleClasses.questionNumber}>
-                Вопрос {currentQuestionIndex + 1} из {totalQuestions}
-              </span>
+          <CardContent className="p-5 md:p-10 flex flex-col min-h-[320px] md:min-h-[380px]">
+            {/* Номер и текст вопроса — фиксированная область */}
+            <div className="flex-1 flex flex-col items-center justify-center text-center">
+              {/* Номер вопроса только в Apple режиме */}
+              {settings.testStyle === 'apple' && (
+                <span className={cn(styleClasses.questionNumber, "mb-6")}>
+                  Вопрос {currentQuestionIndex + 1} из {totalQuestions}
+                </span>
+              )}
               <p className={styleClasses.questionText}>
                 {currentQuestion.text}
               </p>
             </div>
  
-             {/* Кнопки ответов */}
+             {/* Кнопки ответов — всегда внизу карточки */}
             <div className={cn(
-              "flex justify-center mt-8 md:mt-10",
+              "flex justify-center pt-6 md:pt-8 flex-shrink-0",
               settings.testStyle === 'apple' ? "gap-3 md:gap-5" : "gap-3 md:gap-4 w-full max-w-lg mx-auto"
             )}>
-              {/* Да */}
               <button
                 onClick={() => handleAnswer('yes')}
                 className={cn(
@@ -224,7 +230,6 @@ import { cn } from '@/lib/utils';
                 <span>Да</span>
               </button>
 
-              {/* Может быть */}
               <button
                 onClick={() => handleAnswer('maybe')}
                 className={cn(
@@ -240,7 +245,6 @@ import { cn } from '@/lib/utils';
                 <span>Может быть</span>
               </button>
 
-              {/* Нет */}
               <button
                 onClick={() => handleAnswer('no')}
                 className={cn(
@@ -280,10 +284,10 @@ import { cn } from '@/lib/utils';
           {/* Прогресс для Apple стиля */}
           {settings.testStyle === 'apple' && (
             <div className="mb-4">
-              <p className="text-center text-white/70 text-sm uppercase tracking-wider mb-2">
+              <p className="text-center text-foreground/70 dark:text-white/70 text-sm uppercase tracking-wider mb-2">
                 Продвижение по тесту
               </p>
-              <Progress value={progress} className="h-1 bg-white/20" />
+              <Progress value={progress} className="h-1 bg-foreground/20 dark:bg-white/20" />
             </div>
           )}
 
@@ -294,12 +298,12 @@ import { cn } from '@/lib/utils';
                 onClick={prevQuestion}
                 disabled={currentQuestionIndex === 0}
                 size="sm"
-                className="text-white/70 hover:text-white hover:bg-white/10"
+                className="text-foreground/70 dark:text-white/70 hover:text-foreground dark:hover:text-white hover:bg-foreground/10 dark:hover:bg-white/10"
               >
                 <ChevronLeft className="w-5 h-5" />
               </Button>
               {isComplete && (
-                <Button onClick={onComplete} className="bg-white text-[#1a365d] hover:bg-white/90" size="sm">
+                <Button onClick={onComplete} className="bg-foreground dark:bg-white text-background dark:text-[#1a365d] hover:bg-foreground/90 dark:hover:bg-white/90" size="sm">
                   Завершить
                 </Button>
               )}
@@ -308,7 +312,7 @@ import { cn } from '@/lib/utils';
                 onClick={nextQuestion}
                 disabled={currentQuestionIndex === totalQuestions - 1 || !currentAnswer}
                 size="sm"
-                className="text-white/70 hover:text-white hover:bg-white/10"
+                className="text-foreground/70 dark:text-white/70 hover:text-foreground dark:hover:text-white hover:bg-foreground/10 dark:hover:bg-white/10"
               >
                 <ChevronRight className="w-5 h-5" />
               </Button>
@@ -348,7 +352,7 @@ import { cn } from '@/lib/utils';
           {/* Кнопка завершения для Apple на десктопе */}
           {settings.testStyle === 'apple' && isComplete && (
             <div className="hidden md:flex justify-center mt-4">
-              <Button onClick={onComplete} className="bg-white text-[#1a365d] hover:bg-white/90">
+              <Button onClick={onComplete} className="bg-foreground dark:bg-white text-background dark:text-[#1a365d] hover:bg-foreground/90 dark:hover:bg-white/90">
                 Завершить тест
               </Button>
             </div>
